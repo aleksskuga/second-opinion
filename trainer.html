@@ -1,0 +1,1160 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Тренажёр · Второе мнение в родах</title>
+<style>
+  :root {
+    --sage: #3d6b5e;
+    --sage-light: #e8f0ed;
+    --sage-mid: #b2cec7;
+    --red: #b52b2b;
+    --red-light: #fceaea;
+    --amber: #a05e0a;
+    --amber-light: #fdf3e3;
+    --green: #2e6636;
+    --green-light: #e6f2e8;
+    --violet: #4b3a8a;
+    --violet-light: #e9e6f5;
+    --text: #1a1a1a;
+    --muted: #666;
+    --border: #ddd;
+    --bg: #f5f3ef;
+    --card: #fff;
+    --radius: 14px;
+    --font: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; min-height: 100dvh; }
+
+  .topbar {
+    background: var(--sage);
+    color: #fff;
+    padding: 0 16px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,.15);
+  }
+  .topbar .logo { font-weight: 700; font-size: 16px; letter-spacing: -.3px; }
+  .topbar .logo span { opacity: .7; font-weight: 400; font-size: 13px; margin-left: 8px; }
+  .topbar .progress-pill {
+    background: rgba(255,255,255,.18);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    display: none;
+  }
+
+  .main { padding: 16px; max-width: 600px; margin: 0 auto; }
+
+  /* WELCOME SCREEN */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .welcome-hero {
+    background: linear-gradient(135deg, #3d6b5e 0%, #2f5448 100%);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 28px 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 18px rgba(61,107,94,.28);
+    text-align: center;
+  }
+  .welcome-hero h1 { font-size: 22px; margin-bottom: 8px; line-height: 1.3; }
+  .welcome-hero p { font-size: 14px; opacity: .9; line-height: 1.5; }
+
+  .info-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.05);
+  }
+  .info-card h3 { font-size: 15px; margin-bottom: 10px; color: var(--sage); }
+  .info-card p, .info-card li { font-size: 14px; line-height: 1.5; color: #444; }
+  .info-card ul { padding-left: 18px; }
+  .info-card li { margin-bottom: 6px; }
+
+  .pran-mini {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .pran-mini-item {
+    background: var(--sage-light);
+    border-radius: 10px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .pran-mini-item .letter {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--sage);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .pran-mini-item .word {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sage);
+  }
+
+  .btn-primary {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background: var(--sage);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity .15s;
+    margin-top: 8px;
+  }
+  .btn-primary:active { opacity: .85; }
+
+  .btn-secondary {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    background: #fff;
+    color: var(--sage);
+    border: 2px solid var(--sage-mid);
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    margin-top: 8px;
+  }
+  .btn-secondary:active { background: var(--sage-light); }
+
+  /* SCENARIO SCREEN */
+  .scenario-badge {
+    display: inline-block;
+    background: var(--sage-light);
+    color: var(--sage);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+  }
+
+  .scenario-title {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 14px;
+  }
+
+  .doctor-says {
+    background: var(--violet-light);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .doctor-says::before {
+    content: '👩‍⚕️';
+    font-size: 20px;
+    position: absolute;
+    top: -10px;
+    left: 14px;
+  }
+  .doctor-says .label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--violet);
+    margin-bottom: 6px;
+  }
+  .doctor-says p {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #382c63;
+    font-style: italic;
+  }
+
+  .clinical-context {
+    background: #f0ece8;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+  .clinical-context .label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .clinical-context .fact {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 5px 0;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #5a5040;
+  }
+  .clinical-context .fact-icon { flex-shrink: 0; }
+
+  .question-prompt {
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 14px;
+    color: var(--text);
+  }
+
+  .choice-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 16px;
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all .2s;
+    text-align: left;
+  }
+  .choice-btn:active { transform: scale(.98); }
+  .choice-btn .choice-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .choice-btn.wait .choice-icon { background: var(--green-light); }
+  .choice-btn.act .choice-icon { background: var(--red-light); }
+  .choice-btn.ask .choice-icon { background: var(--amber-light); }
+  .choice-btn .choice-text { flex: 1; }
+  .choice-btn .choice-text strong { display: block; font-size: 15px; margin-bottom: 2px; }
+  .choice-btn .choice-text span { font-size: 13px; color: var(--muted); line-height: 1.3; }
+
+  .choice-btn.selected-correct {
+    border-color: var(--green);
+    background: var(--green-light);
+  }
+  .choice-btn.selected-wrong {
+    border-color: var(--red);
+    background: var(--red-light);
+  }
+  .choice-btn.was-correct {
+    border-color: var(--green);
+    border-style: dashed;
+  }
+  .choice-btn.disabled { pointer-events: none; opacity: .7; }
+
+  /* FEEDBACK */
+  .feedback-box {
+    display: none;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 14px;
+    line-height: 1.5;
+    animation: fadeIn .3s ease;
+  }
+  .feedback-box.visible { display: block; }
+  .feedback-box.correct { background: var(--green-light); border: 1.5px solid #b2d6b8; }
+  .feedback-box.wrong { background: var(--red-light); border: 1.5px solid #f0b4b4; }
+  .feedback-box .fb-title {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+  .feedback-box.correct .fb-title { color: var(--green); }
+  .feedback-box.wrong .fb-title { color: var(--red); }
+  .feedback-box .fb-text { font-size: 14px; color: #333; }
+
+  .pran-hint {
+    background: var(--sage-light);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 12px;
+    display: none;
+  }
+  .pran-hint.visible { display: block; }
+  .pran-hint .ph-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--sage);
+    margin-bottom: 6px;
+  }
+  .pran-hint .ph-item {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #2f5448;
+    padding: 4px 0;
+    padding-left: 14px;
+    position: relative;
+  }
+  .pran-hint .ph-item::before {
+    content: '?';
+    position: absolute;
+    left: 0;
+    color: var(--sage);
+    font-weight: 700;
+  }
+
+  .myth-box {
+    background: var(--violet-light);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #382c63;
+    line-height: 1.45;
+    display: none;
+  }
+  .myth-box.visible { display: block; }
+  .myth-box strong { color: var(--violet); }
+
+  .next-btn {
+    display: none;
+    width: 100%;
+    padding: 14px;
+    background: var(--sage);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 16px;
+  }
+  .next-btn.visible { display: block; }
+  .next-btn:active { opacity: .85; }
+
+  /* RESULTS SCREEN */
+  .results-hero {
+    text-align: center;
+    padding: 28px 22px;
+    margin-bottom: 16px;
+  }
+  .results-hero .score-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-weight: 800;
+  }
+  .results-hero .score-circle .num { font-size: 36px; }
+  .results-hero .score-circle .denom { font-size: 14px; opacity: .7; }
+  .results-hero h2 { font-size: 20px; margin-bottom: 8px; }
+  .results-hero p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+  .result-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .result-item .ri-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .result-item.ri-correct .ri-icon { background: var(--green-light); }
+  .result-item.ri-wrong .ri-icon { background: var(--red-light); }
+  .result-item .ri-text { flex: 1; }
+  .result-item .ri-text strong { font-size: 14px; display: block; margin-bottom: 2px; }
+  .result-item .ri-text span { font-size: 13px; color: var(--muted); }
+
+  .disclaimer {
+    background: #f0ece8;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: #5a5040;
+    line-height: 1.4;
+    margin-top: 18px;
+    margin-bottom: 24px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .mode-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .mode-toggle button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .mode-toggle button.active {
+    border-color: var(--sage);
+    color: var(--sage);
+    background: var(--sage-light);
+  }
+
+  .bottom-space { height: 40px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Тренажёр <span>Второе мнение</span></div>
+  <div class="progress-pill" id="progressPill"></div>
+</div>
+
+<div class="main">
+
+  <!-- WELCOME -->
+  <div class="screen active" id="welcomeScreen">
+    <div class="welcome-hero">
+      <h1>Тренажёр принятия решений в родах</h1>
+      <p>Потренируйтесь оценивать предложения врача до того, как окажетесь в родзале. Не заменяет врача — учит задавать правильные вопросы.</p>
+    </div>
+
+    <div class="info-card">
+      <h3>Как это работает</h3>
+      <ul>
+        <li>Вам покажут клиническую ситуацию — что говорит врач и что вы наблюдаете</li>
+        <li>Вы решаете: <strong>подождать</strong>, <strong>согласиться</strong> или <strong>уточнить</strong></li>
+        <li>После выбора — разбор: почему это верно или нет, и какие вопросы стоило задать</li>
+      </ul>
+    </div>
+
+    <div class="info-card">
+      <h3>Метод ПРАН — ваш главный инструмент</h3>
+      <p>Перед любым вмешательством задайте врачу 4 вопроса:</p>
+      <div class="pran-mini">
+        <div class="pran-mini-item"><span class="letter">П</span><span class="word">Польза</span></div>
+        <div class="pran-mini-item"><span class="letter">Р</span><span class="word">Риски</span></div>
+        <div class="pran-mini-item"><span class="letter">А</span><span class="word">Альтернатива</span></div>
+        <div class="pran-mini-item"><span class="letter">Н</span><span class="word">Ничего</span></div>
+      </div>
+    </div>
+
+    <div class="mode-toggle">
+      <button class="active" id="modeAll" onclick="setMode('all')">Все сценарии (11)</button>
+      <button id="modeQuick" onclick="setMode('quick')">Быстрый (5)</button>
+    </div>
+
+    <button class="btn-primary" onclick="startTraining()">Начать тренировку</button>
+    <a href="akusher_prod_v5.html" style="display:block;text-align:center;margin-top:12px;font-size:14px;color:var(--sage);text-decoration:none;font-weight:600;">Открыть справочник →</a>
+
+    <div class="disclaimer">
+      Приложение не является медицинским устройством и не заменяет консультацию врача. Это инструмент для подготовки к информированному диалогу с медперсоналом в родах.
+    </div>
+  </div>
+
+  <!-- SCENARIO -->
+  <div class="screen" id="scenarioScreen">
+    <div class="scenario-badge" id="scenarioBadge"></div>
+    <div class="scenario-title" id="scenarioTitle"></div>
+
+    <div class="doctor-says">
+      <div class="label">Врач говорит</div>
+      <p id="doctorText"></p>
+    </div>
+
+    <div class="clinical-context">
+      <div class="label">Что вы наблюдаете</div>
+      <div id="contextFacts"></div>
+    </div>
+
+    <div class="question-prompt">Что вы решите?</div>
+    <div id="choicesContainer"></div>
+
+    <div class="feedback-box" id="feedbackBox">
+      <div class="fb-title" id="fbTitle"></div>
+      <div class="fb-text" id="fbText"></div>
+    </div>
+
+    <div class="pran-hint" id="pranHint">
+      <div class="ph-title">Вопросы врачу по методу ПРАН</div>
+      <div id="pranQuestions"></div>
+    </div>
+
+    <div class="myth-box" id="mythBox"></div>
+
+    <button class="next-btn" id="nextBtn" onclick="nextScenario()">Следующий сценарий →</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="screen" id="resultsScreen">
+    <div class="results-hero">
+      <div class="score-circle" id="scoreCircle">
+        <span class="num" id="scoreNum"></span>
+        <span class="denom" id="scoreDenom"></span>
+      </div>
+      <h2 id="resultsTitle"></h2>
+      <p id="resultsSubtitle"></p>
+    </div>
+
+    <div id="resultsList"></div>
+
+    <button class="btn-primary" onclick="startTraining()" style="margin-top:16px;">Пройти ещё раз</button>
+    <button class="btn-secondary" onclick="showWelcome()">На главную</button>
+    <a href="akusher_prod_v5.html" style="display:block;text-align:center;margin-top:12px;font-size:14px;color:var(--sage);text-decoration:none;font-weight:600;">Открыть полный справочник →</a>
+
+    <div class="disclaimer">
+      Приложение не является медицинским устройством и не заменяет консультацию врача. Это инструмент для подготовки к информированному диалогу с медперсоналом в родах.
+    </div>
+  </div>
+
+  <div class="bottom-space"></div>
+</div>
+
+<script>
+const scenarios = [
+  {
+    id: 1,
+    topic: 'Окситоцин / стимуляция',
+    title: 'Врач предлагает стимуляцию окситоцином',
+    variants: [
+      {
+        doctor: '«Схватки слабые, раскрытие не идёт. Давайте поставим окситоцин, чтобы ускорить процесс.»',
+        facts: [
+          { icon: '📊', text: 'Раскрытие 4 см — латентная фаза' },
+          { icon: '💓', text: 'КТГ: ЧСС плода 140 уд/мин, хорошая вариабельность' },
+          { icon: '🤰', text: 'Схватки нерегулярные, но есть динамика' },
+          { icon: '🌡️', text: 'Температура 36.7°C, самочувствие хорошее' }
+        ],
+        correct: 'wait',
+        choices: [
+          { id: 'wait', type: 'wait', icon: '⏳', title: 'Попросить подождать', desc: 'Спросить, можно ли дать 1–2 часа и попробовать немедикаментозные меры' },
+          { id: 'act', type: 'act', icon: '💉', title: 'Согласиться на окситоцин', desc: 'Если врач говорит — значит, надо' },
+          { id: 'ask', type: 'ask', icon: '❓', title: 'Задать вопросы по ПРАН', desc: 'Уточнить показания, риски, альтернативы' }
+        ],
+        feedback: {
+          wait: { correct: true, title: '✅ Верно — можно подождать', text: 'Раскрытие 4 см — это ещё латентная фаза. Схватки есть и динамика есть. Плод стабилен. Можно попросить 1–2 часа: менять позу, двигаться, пить воду. Это не отказ от помощи — это разумное ожидание.' },
+          act: { correct: false, title: '❌ Поспешное решение', text: 'Латентная фаза (до 5–6 см) может длиться долго — это нормально. Окситоцин делает схватки сильнее и болезненнее, часто тянет за собой эпидуралку. Плод стабилен, красных флагов нет — можно попросить время.' },
+          ask: { correct: true, title: '✅ Хороший подход', text: 'Вопросы по ПРАН — отличный первый шаг. Уточните: это реальная слабость родовой деятельности или ещё латентная фаза? В данной ситуации показаний для срочной стимуляции нет.' }
+        },
+        pran: [
+          'Это активная фаза или ещё латентная? На каком основании стимуляция?',
+          'Какие риски у окситоцина в моей ситуации?',
+          'Можно ли попробовать движение, вертикальное положение, гидратацию?',
+          'Что будет, если подождать 1–2 часа?'
+        ],
+        myth: '⚠️ Окситоцин делает схватки сильнее и болезненнее → часто тянет за собой эпидуралку → ребёнок может не выдержать → кесарево. Этот каскад запускается без реальных показаний чаще, чем кажется.'
+      },
+      {
+        doctor: '«Схваток нет уже 4 часа, раскрытие стоит на месте. Активная фаза не продвигается — нужен окситоцин.»',
+        facts: [
+          { icon: '📊', text: 'Раскрытие 7 см, не менялось 4 часа' },
+          { icon: '💓', text: 'КТГ: ЧСС плода 145 уд/мин, без децелераций' },
+          { icon: '🤰', text: 'Схватки прекратились, роженица устала' },
+          { icon: '🚶', text: 'Пробовали ходить, менять позу — без эффекта' }
+        ],
+        correct: 'act',
+        choices: [
+          { id: 'wait', type: 'wait', icon: '⏳', title: 'Подождать ещё', desc: 'Может, это фаза замедления — само пройдёт' },
+          { id: 'act', type: 'act', icon: '💉', title: 'Согласиться на стимуляцию', desc: 'Активная фаза подтверждена, меры предприняты — стимуляция обоснована' },
+          { id: 'ask', type: 'ask', icon: '❓', title: 'Задать вопросы по ПРАН', desc: 'Уточнить, точно ли исчерпаны альтернативы' }
+        ],
+        feedback: {
+          wait: { correct: false, title: '❌ В этой ситуации ожидание рискованно', text: 'Раскрытие 7 см — подтверждённая активная фаза. Схватки прекратились на 4+ часа, нефармакологические меры не помогли. Фаза замедления обычно длится 1–2 часа, а не 4. Дальнейшее ожидание может привести к истощению матери.' },
+          act: { correct: true, title: '✅ Верно — стимуляция обоснована', text: 'Активная фаза подтверждена (7 см), прогресса нет 4 часа, немедикаментозные меры предприняты. Это не фаза замедления (та длится 1–2 часа). Стимуляция здесь — обоснованное решение.' },
+          ask: { correct: true, title: '✅ Разумно уточнить', text: 'Спросить — всегда правильно. Но в данной ситуации показания к стимуляции объективно сильные: подтверждённая остановка активной фазы. После уточнений, вероятнее всего, стоит согласиться.' }
+        },
+        pran: [
+          'Все ли немедикаментозные меры были предприняты?',
+          'Какой план, если окситоцин не поможет?',
+          'С какой дозировки начнёте и как будете контролировать?'
+        ],
+        myth: null
+      }
+    ]
+  },
+  {
+    id: 2,
+    topic: 'Кесарево / дистресс плода',
+    title: 'Врач предлагает кесарево из-за состояния плода',
+    variants: [
+      {
+        doctor: '«Ребёнок стал меньше двигаться, ЧСС подозрительная. Думаю, нужно делать кесарево.»',
+        facts: [
+          { icon: '📊', text: 'Раскрытие 9 см — рождение скоро' },
+          { icon: '💓', text: 'КТГ: ЧСС 130 уд/мин, есть вариабельность, редкие децелерации' },
+          { icon: '🤰', text: 'Роженица лежит на спине' },
+          { icon: '✅', text: 'Нет задержки роста, нет маловодия в анамнезе' }
+        ],
+        correct: 'wait',
+        choices: [
+          { id: 'wait', type: 'wait', icon: '⏳', title: 'Попросить 30 минут', desc: 'Сменить позу на бок, подышать, повторить КТГ' },
+          { id: 'act', type: 'act', icon: '🔪', title: 'Согласиться на кесарево', desc: 'Раз врач говорит о проблемах — лучше не рисковать' },
+          { id: 'ask', type: 'ask', icon: '❓', title: 'Уточнить результаты КТГ', desc: 'Патологическая или пограничная? Что именно тревожит?' }
+        ],
+        feedback: {
+          wait: { correct: true, title: '✅ Верно — можно попросить время', text: 'Раскрытие 9 см — рождение очень близко. КТГ показывает нормальную ЧСС с вариабельностью, децелерации редкие. Роженица на спине — это часто ухудшает показатели. Смена позы на бок может улучшить КТГ за минуты.' },
+          act: { correct: false, title: '❌ Кесарево, вероятно, преждевременно', text: 'При раскрытии 9 см рождение близко. КТГ пограничная, не патологическая. Лежание на спине само по себе ухудшает показатели. Стоило попросить 30 минут: повернуться на бок, подышать, повторить КТГ.' },
+          ask: { correct: true, title: '✅ Правильный вопрос', text: 'Очень важно понять: КТГ патологическая (стойкая брадикардия, монотонная) или пограничная (редкие децелерации с восстановлением). В данном случае — пограничная. Можно попросить время и сменить позу.' }
+        },
+        pran: [
+          'КТГ патологическая или пограничная?',
+          'Можно ли 30 минут: повернуться на бок, открыть окно, подышать?',
+          'Есть ли возможность вагинального завершения при раскрытии 9 см?'
+        ],
+        myth: '💡 Смена позы на бок и кислород могут улучшить КТГ за минуты. На спине показатели часто ухудшаются — это не всегда дистресс.'
+      },
+      {
+        doctor: '«Сердцебиение ребёнка падает и не восстанавливается. Нужно экстренное кесарево.»',
+        facts: [
+          { icon: '📊', text: 'Раскрытие 5 см' },
+          { icon: '💓', text: 'КТГ: ЧСС упала до 95 уд/мин, не восстанавливается 5 минут, монотонная' },
+          { icon: '⚠️', text: 'Подтверждённая задержка роста плода в анамнезе' },
+          { icon: '🤰', text: 'Позу меняли — не помогает' }
+        ],
+        correct: 'act',
+        choices: [
+          { id: 'wait', type: 'wait', icon: '⏳', title: 'Подождать ещё', desc: 'Попробовать другие позы, может восстановится' },
+          { id: 'act', type: 'act', icon: '🔪', title: 'Согласиться на кесарево', desc: 'Стойкая брадикардия — реальная угроза' },
+          { id: 'ask', type: 'ask', icon: '❓', title: 'Задать вопросы', desc: 'Может быть, есть альтернативы' }
+        ],
+        feedback: {
+          wait: { correct: false, title: '❌ Ожидание опасно', text: 'Стойкая брадикардия ниже 110 уд/мин, которая не восстанавливается — это патологическая КТГ. В сочетании с задержкой роста плода — реальная угроза. Смену позы уже пробовали. Каждая минута на счету.' },
+          act: { correct: true, title: '✅ Верно — кесарево обосновано', text: 'При подтверждённом дистрессе (стойкая брадикардия <110 уд/мин + монотонная КТГ + задержка роста) — кесарево спасает жизнь. Альтернативные меры уже не помогли. Это тот случай, когда быстрое действие важнее ожидания.' },
+          ask: { correct: false, title: '❌ Время на вопросы уже упущено', text: 'При стойкой брадикардии <110 + монотонной КТГ ситуация экстренная. Вопросы — отличный инструмент, но в экстренных случаях каждая минута критична. Здесь нужно соглашаться сразу.' }
+        },
+        pran: [
+          'В экстренной ситуации ПРАН применяется быстро:',
+          'Польза: спасение жизни ребёнка',
+          'Риски кесарева ниже, чем риск продолжения при стойком дистрессе'
+        ],
+        myth: null
+      }
+    ]
+  },
+  {
+    id: 3,
+    topic: 'Зелёные воды',
+    title: 'У вас отошли зелёные воды',
+    variants: [
+      {
+        doctor: '«Воды зелёные — это значит ребёнку плохо. Нужно срочно делать кесарево.»',
+        facts: [
+          { icon: '💚', text: 'Воды слегка зеленоватые, без запаха' },
+          { icon: '💓', text: 'КТГ: ЧСС 138 уд/мин, вариабельность в норме' },
+          { icon: '📊', text: 'Раскрытие 7 см, прогресс есть' },
+          { icon: '🌡️', text: 'Температура 36.6°C' }
+        ],
+        correct: 'wait',
+        choices: [
+          { id: 'wait', type: 'wait', icon: '👁️', title: 'Усилить контроль, но не оперировать', desc: 'Зелёные воды ≠ автоматическое кесарево' },
+          { id: 'act', type: 'act', icon: '🔪', title: 'Согласиться на кесарево', desc: 'Зелёные воды — опасный признак' },
+          { id: 'ask', type: 'ask', icon: '❓', title: 'Уточнить: насколько критично?', desc: 'Спросить про степень окрашивания и состояние плода' }
+        ],
+        feedback: {
+          wait: { correct: true, title: '✅ Верно — контроль, не операция', text: 'Зелёные воды — повод усилить наблюдение, но не автоматическое показание к кесареву. Воды слегка зеленоватые (не тёмные), плод стабилен, прогресс есть. Воды обновляются каждые ~3 часа — ситуация может нормализоваться.' },
+          act: { correct: false, title: '❌ Кесарево преждевременно', text: 'Зеленоватый оттенок вод значит, что в какой-то момент ребёнку было некомфортно (отошёл меконий). Но сейчас КТГ в норме, раскрытие идёт. Тёмные «болотные» воды с запахом — другая ситуация. Здесь достаточно усиленного контроля.' },
+          ask: { correct: true, title: '✅ Правильная тактика', text: 'Степень окрашивания вод критически важна: слегка зеленоватые vs. тёмно-зелёные «болотные». В данном случае — лёгкий оттенок, плод стабилен. Кесарево не показано, но наблюдение нужно усилить.' }
+        },
+        pran: [
+          'Насколько выражен зелёный цвет — лёгкий оттенок или тёмный, с запахом?',
+          'Что показывает КТГ прямо сейчас?',
+          'Можно ли продолжить наблюдение при стабильном плоде?'
+        ],
+        myth: '⚠️ Миф: «зелёные воды = протухли от переношенности». Правда: зелёный цвет даёт меконий — первородный кал; значит, в какой-то момент ребёнку было плохо, но ситуация может выровняться.'
+      }
+    ]
+  },
+  {
+    id: 4,
+    topic: 'Амниотомия',
+    title: 'Врач хочет вскрыть плодный пузырь',
+    variants: [
+      {
+        doctor: '«Давайте проколем пузырь, чтобы роды пошли быстрее.»',
+        facts: [
+          { icon: '📊', text: 'Раскрытие 6 см, схватки регулярные' },
+          { icon: '💓', text: 'КТГ в норме' },
+          { icon: '👶', text: 'Головка высоко' },
+          { icon: '✅', text: 'Прогресс есть, мать и плод стабильны' }
+        ],
+        correct: 'wait',
+        choices: [
+          { id: 'wait', type: 'wait', icon: '🫧', title: 'Отказаться — можно подождать', desc: 'Прогресс есть, головка высоко — рискованно' },
+          { id: 'act', type: 'act', icon: '💧', title: 'Согласиться на амниотомию', desc: 'Быстрее роды — меньше мучений' },
+          { id: 'ask', type: 'ask', icon: '❓', title: 'Спросить: зачем именно сейчас?', desc: 'Уточнить показания по ПРАН' }
+        ],
+        feedback: {
+          wait: { correct: true, title: '✅ Верно — амниотомия не нужна', text: 'Прогресс есть, все стабильны. При высоко стоящей головке амниотомия повышает риск выпадения пуповины — это опасно. «Просто для ускорения» статистически не помогает, но делает схватки резко болезненнее.' },
+          act: { correct: false, title: '❌ Есть риски, которые стоило учесть', text: 'При высоко стоящей головке вскрытие пузыря опасно — риск выпадения пуповины. Прогресс и так идёт. После амниотомии схватки сразу станут интенсивнее и болезненнее. Без конкретных показаний — лучше подождать.' },
+          ask: { correct: true, title: '✅ Правильный подход', text: 'Ключевые вопросы: что конкретно даст амниотомия? На каком уровне стоит головка? В данном случае — головка высоко, конкретных показаний нет. Лучше подождать.' }
+        },
+        pran: [
+          'Что конкретно даст амниотомия, чего нельзя получить при ожидании?',
+          'На каком уровне стоит головка? Безопасно ли вскрывать?',
+          'Какие риски у амниотомии при высоко стоящей головке?'
+        ],
+        myth: '💧 После амниотомии головка давит напрямую на шейку — схватки сразу становятся интенсивнее и болезненнее. «Просто для ускорения» статистически не помогает.'
+      }
+    ]
+  },
+  {
+    id: 5,
+    topic: 'Безводный период',
+    title: 'Врач настаивает на вмешательстве из-за безводного периода',
+    variants: [
+      {
+        doctor: '«Прошло 14 часов без вод. По протоколу — максимум 12 часов. Нужно стимулировать или оперировать.»',
+        facts: [
+          { icon: '⏱️', text: 'Безводный период: 14 часов' },
+          { icon: '🌡️', text: 'Температура 36.5°C — норма' },
+          { icon: '💓', text: 'КТГ: ЧСС 135 уд/мин, всё в порме' },
+          { icon: '🩸', text: 'Лейкоциты в норме (утренний анализ)' }
+        ],
+        correct: 'wait',
+        choices: [
+          { id: 'wait', type: 'wait', icon: '⏱️', title: 'Продолжить наблюдение', desc: 'Показатели в норме — 12 часов не предел' },
+          { id: 'act', type: 'act', icon: '💉', title: 'Согласиться на стимуляцию', desc: '14 часов — уже давно, лучше не тянуть' },
+          { id: 'ask', type: 'ask', icon: '❓', title: 'Уточнить: откуда лимит 12 часов?', desc: 'Спросить, есть ли протокол или это личная практика' }
+        ],
+        feedback: {
+          wait: { correct: true, title: '✅ Верно — наблюдение оправдано', text: 'Российский протокол 2021 не устанавливает жёсткий часовой лимит безводного периода. Мировая практика — до 72 ч при стабильных показателях. «12 часов» — личная практика конкретного врача, не стандарт. Все маркеры в норме.' },
+          act: { correct: false, title: '❌ Стимуляция не обязательна', text: '14 часов без вод при нормальной температуре, нормальных лейкоцитах и стабильном плоде — не показание к срочным мерам. Протокол РФ 2021 не фиксирует лимит. Важно продолжать контроль и пить воду (воды обновляются каждые ~3 часа).' },
+          ask: { correct: true, title: '✅ Отличный вопрос', text: '«12 часов» — не протокольный стандарт, а личная практика врача. Российский протокол 2021 не устанавливает часовой лимит. При стабильных показателях можно продолжать наблюдение с регулярным контролем температуры, КТГ и лейкоцитов.' }
+        },
+        pran: [
+          'На основании какого протокола установлен лимит 12 часов?',
+          'Какие конкретные признаки инфекции вы видите?',
+          'Можно ли продолжить наблюдение с контролем температуры и КТГ?'
+        ],
+        myth: '📋 «12 часов» или «24 часа» — личная практика конкретного врача, не протокольный стандарт. Воды обновляются каждые ~3 часа. Важно пить воду и контролировать показатели.'
+      }
+    ]
+  },
+  {
+    id: 6,
+    topic: 'Затяжные роды',
+    title: 'Врач говорит: «нет прогресса» — нужно кесарево',
+    variants: [
+      {
+        doctor: '«Раскрытие стоит, роды затянулись. Думаю, нужно оперировать.»',
+        facts: [
+          { icon: '📊', text: 'Раскрытие 4 см, наблюдение 2 часа' },
+          { icon: '💓', text: 'Плод стабилен' },
+          { icon: '🤰', text: 'Роженица лежит в кровати, не двигается' },
+          { icon: '💧', text: 'Не предлагали движение, позу, гидратацию' }
+        ],
+        correct: 'wait',
+        choices: [
+          { id: 'wait', type: 'wait', icon: '⏳', title: 'Попросить больше времени', desc: 'Активная фаза не подтверждена, меры не предприняты' },
+          { id: 'act', type: 'act', icon: '🔪', title: 'Согласиться на кесарево', desc: 'Врачу виднее, раз прогресса нет' },
+          { id: 'ask', type: 'ask', icon: '❓', title: 'Спросить: с какого момента нет прогресса?', desc: 'Уточнить критерии «затяжных родов»' }
+        ],
+        feedback: {
+          wait: { correct: true, title: '✅ Верно — слишком рано для кесарева', text: 'Раскрытие 4 см — это ещё не подтверждённая активная фаза (начинается с 5–6 см). 2 часа наблюдения — мало. Не были предприняты поддерживающие меры: движение, вертикальное положение, питьё. Плод стабилен — можно и нужно подождать.' },
+          act: { correct: false, title: '❌ Кесарево не обосновано', text: 'Активная фаза начинается с 5–6 см. При 4 см и 2 часах наблюдения говорить о «затяжных родах» преждевременно. Не были предприняты базовые меры: ходьба, смена позы, гидратация. Кесарево здесь — избыточное вмешательство.' },
+          ask: { correct: true, title: '✅ Ключевой вопрос', text: '«Отсутствие прогресса» имеет конкретные критерии: активная фаза (5+ см), регулярные схватки, отсутствие динамики 4+ часа. При 4 см и 2 часах эти критерии не выполнены.' }
+        },
+        pran: [
+          'С какого раскрытия и за какой период считается «отсутствие прогресса»?',
+          'Были ли предприняты поддерживающие меры: движение, поза, питьё?',
+          'Может быть, это нормальная латентная фаза?'
+        ],
+        myth: null
+      }
+    ]
+  },
+  {
+    id: 7,
+    topic: 'Фаза замедления',
+    title: 'Схватки остановились — врач предлагает окситоцин',
+    variants: [
+      {
+        doctor: '«Схватки прекратились при 8 сантиметрах. Это ненормально. Поставим окситоцин.»',
+        facts: [
+          { icon: '📊', text: 'Раскрытие 8 см, до этого шло хорошо' },
+          { icon: '💓', text: 'Плод спокоен, КТГ отличная' },
+          { icon: '🤰', text: 'Роженица хочет спать, температура в норме' },
+          { icon: '⏱️', text: 'Схватки остановились 40 минут назад' }
+        ],
+        correct: 'wait',
+        choices: [
+          { id: 'wait', type: 'wait', icon: '😴', title: 'Это норма — отдохнуть', desc: 'Похоже на фазу замедления, можно подождать 1–2 часа' },
+          { id: 'act', type: 'act', icon: '💉', title: 'Согласиться на окситоцин', desc: 'Схватки остановились — значит, что-то не так' },
+          { id: 'ask', type: 'ask', icon: '❓', title: 'Спросить про фазу замедления', desc: 'Может ли это быть нормальной паузой?' }
+        ],
+        feedback: {
+          wait: { correct: true, title: '✅ Верно — это фаза замедления', text: 'При 7–10 см схватки могут временно прекращаться на 1–2 часа. Это фаза замедления — тело отдыхает перед потугами. Протоколы её не предусматривают, но она существует и является вариантом нормы. Плод стабилен, мать стабильна — спать и расслабиться.' },
+          act: { correct: false, title: '❌ Окситоцин не нужен', text: 'Остановка схваток при 8 см после хорошего прогресса — классическая фаза замедления. Она длится 1–2 часа, потом роды возобновляются сами. Окситоцин сейчас не даст ничего, кроме лишней боли. Лучше отдохнуть.' },
+          ask: { correct: true, title: '✅ Правильный вопрос', text: 'Фаза замедления — не прописана в протоколах, поэтому многие врачи её «лечат» автоматически. Но при стабильных мать+плод и хорошем предшествующем прогрессе — это нормальная пауза. Стоит подождать 1–2 часа.' }
+        },
+        pran: [
+          'Может ли это быть фазой замедления при хорошем предшествующем прогрессе?',
+          'Плод стабилен — можно ли подождать 1–2 часа?',
+          'Какие показания для окситоцина именно сейчас?'
+        ],
+        myth: '😴 Фаза замедления не прописана в протоколах — врачи её «лечат» автоматически. Но в норме она длится 1–2 часа, и роды возобновляются сами. Тело отдыхает перед финальным рывком.'
+      }
+    ]
+  },
+  {
+    id: 8,
+    topic: 'Переходная фаза',
+    title: 'Полное раскрытие — врач говорит тужиться',
+    variants: [
+      {
+        doctor: '«Раскрытие полное, 10 сантиметров. Давайте, тужьтесь!»',
+        facts: [
+          { icon: '📊', text: 'Раскрытие 10 см — полное' },
+          { icon: '🤰', text: 'Ощущение «тужит» только на самом пике схватки, потом исчезает' },
+          { icon: '💓', text: 'Плод стабилен' },
+          { icon: '👶', text: 'Головка ещё опускается' }
+        ],
+        correct: 'wait',
+        choices: [
+          { id: 'wait', type: 'wait', icon: '🌊', title: 'Подождать — ещё рано', desc: 'Позыв не постоянный, головка ещё опускается' },
+          { id: 'act', type: 'act', icon: '💪', title: 'Начать тужиться', desc: '10 см = пора тужиться, врач командует' },
+          { id: 'ask', type: 'ask', icon: '❓', title: 'Спросить: как понять, что пора?', desc: 'Уточнить, опустилась ли головка' }
+        ],
+        feedback: {
+          wait: { correct: true, title: '✅ Верно — тужиться рано', text: 'Полное раскрытие — не сигнал тужиться. Переходная фаза от раскрытия до «тужить прямо сейчас» длится 30 минут — 2 часа. Ощущение потуг только на пике — значит головка ещё опускается. Тужиться раньше времени = тратить силы впустую.' },
+          act: { correct: false, title: '❌ Рано тужиться', text: 'Ощущение «тужит» только на пике схватки — голова ещё опускается. Тужиться по команде раньше позыва — частая ошибка, отнимающая силы. Нужно подождать, пока давление станет постоянным (с начала и до конца каждой схватки).' },
+          ask: { correct: true, title: '✅ Правильная тактика', text: 'Сигнал к потугам — постоянное давление с начала схватки до конца, ощущение «хочу в туалет прямо сейчас». Периодическое давление только на пике — переходная фаза, не время для потуг.' }
+        },
+        pran: [
+          'Опустилась ли головка на тазовое дно?',
+          'Ощущение потуг у меня непостоянное — может, подождать?',
+          'Что будет, если потужиться слишком рано?'
+        ],
+        myth: '🌊 Тужиться по команде раньше, чем ощущение стало постоянным — распространённая практика, но она отнимает силы. Природа даёт чёткий сигнал: нестерпимое постоянное давление вниз.'
+      }
+    ]
+  },
+  {
+    id: 9,
+    topic: 'Эпидуральная анестезия',
+    title: 'Врач предлагает эпидуральную анестезию',
+    variants: [
+      {
+        doctor: '«Вижу, вам больно. Давайте поставим эпидуралку — сразу станет легче.»',
+        facts: [
+          { icon: '📊', text: 'Раскрытие 5 см, роды без стимуляции' },
+          { icon: '💓', text: 'КТГ в норме, схватки естественные' },
+          { icon: '🤰', text: 'Боль нарастает, но между схватками есть паузы' },
+          { icon: '🩺', text: 'Давление в норме, нет дискоординации' }
+        ],
+        correct: 'wait',
+        choices: [
+          { id: 'wait', type: 'wait', icon: '💪', title: 'Попробовать без анестезии', desc: 'Показаний нет, работают эндорфины' },
+          { id: 'act', type: 'act', icon: '💉', title: 'Согласиться на эпидуральную', desc: 'Зачем терпеть, если можно не терпеть' },
+          { id: 'ask', type: 'ask', icon: '❓', title: 'Спросить: есть ли показания?', desc: 'Уточнить, есть ли медицинская причина' }
+        ],
+        feedback: {
+          wait: { correct: true, title: '✅ Верно — можно обойтись', text: 'Нет медицинских показаний (давление в норме, нет дискоординации, роды не затяжные). Схватки естественные с паузами — работают эндорфины (собственное обезболивающее для матери и ребёнка). Помогают: движение, дыхание, вода, тепло, смена поз.' },
+          act: { correct: false, title: '❌ Есть что учесть', text: 'Эпидуралка — не «просто обезболивание». Она отключает механизм эндорфинов, требует непрерывной КТГ, может снизить давление и замедлить роды. При естественных схватках без показаний — лучше использовать немедикаментозные методы.' },
+          ask: { correct: true, title: '✅ Мудрый подход', text: 'Показания к эпидуральной: высокое давление, дискоординация (сильные схватки без раскрытия), затяжные роды с истощением, роды на окситоцине. Здесь ни одного показания нет — можно обойтись.' }
+        },
+        pran: [
+          'Есть ли медицинские показания для анестезии?',
+          'Какие побочные эффекты у эпидуральной в моём случае?',
+          'Можно ли попробовать немедикаментозное обезболивание?',
+          'Если поставить эпидуралку — потребуется ли непрерывная КТГ?'
+        ],
+        myth: '⚠️ Каскад: окситоцин → невыносимая боль → эпидуралка → нет эндорфинов → плод в стрессе → дистресс → кесарево. Часто запускается без реальных показаний.'
+      }
+    ]
+  },
+  {
+    id: 10,
+    topic: 'Обвитие пуповиной',
+    title: 'На УЗИ нашли обвитие — врач предлагает кесарево',
+    variants: [
+      {
+        doctor: '«У ребёнка обвитие пуповиной. Рожать самой опасно — нужно кесарево.»',
+        facts: [
+          { icon: '🪢', text: 'УЗИ: «петли в проекции шеи» (обвитие)' },
+          { icon: '💓', text: 'КТГ: ЧСС 142 уд/мин, отличная вариабельность' },
+          { icon: '📏', text: 'Длина пуповины нормальная' },
+          { icon: '🤰', text: 'Срок 39 недель, всё в порядке' }
+        ],
+        correct: 'wait',
+        choices: [
+          { id: 'wait', type: 'wait', icon: '🪢', title: 'Обвитие — не показание к КС', desc: 'При нормальной длине пуповины и хорошей КТГ можно рожать' },
+          { id: 'act', type: 'act', icon: '🔪', title: 'Согласиться на кесарево', desc: 'Пуповина может задушить ребёнка' },
+          { id: 'ask', type: 'ask', icon: '❓', title: 'Уточнить детали', desc: 'Спросить про длину пуповины и КТГ' }
+        ],
+        feedback: {
+          wait: { correct: true, title: '✅ Верно — обвитие не показание к кесареву', text: 'Обычное обвитие при нормальной длине пуповины и хорошей КТГ не требует кесарева. Пуповина — плотный жёсткий шнур в желеобразной субстанции, она физически не пережимается. Кислород идёт через сосуды пуповины, не через горло. Даже 4–5-кратное обвитие при нормальной длине проходит благополучно.' },
+          act: { correct: false, title: '❌ Кесарево не обосновано', text: 'Миф «пуповина задушит» — один из самых распространённых. Пуповина не пережимает горло: кислород идёт через сосуды, а не через дыхательные пути. При нормальной длине и хорошей КТГ — можно рожать через естественные пути под наблюдением.' },
+          ask: { correct: true, title: '✅ Правильные вопросы', text: 'Ключевое — длина пуповины (короткая = реальный риск) и КТГ. В данном случае: длина нормальная, КТГ отличная. Кесарево не обосновано. Но если пуповина короткая + ухудшение КТГ в родах — ситуация меняется.' }
+        },
+        pran: [
+          'Какова длина пуповины? Не короткая ли?',
+          'Что показывает КТГ — есть ли признаки страдания плода?',
+          'Можно ли попробовать естественные роды с контролем КТГ?'
+        ],
+        myth: '⚠️ Миф: «обвитие = кесарево» и «пуповина задушит». Правда: пуповина — плотный шнур в желе, кислород идёт через сосуды, не через горло. Обвитие по УЗИ и обвитие в родах — разные истории.'
+      }
+    ]
+  },
+  {
+    id: 11,
+    topic: 'Индукция по сроку',
+    title: 'Врач предлагает стимуляцию «по сроку»',
+    variants: [
+      {
+        doctor: '«Срок 40 недель и 3 дня. ПДР прошла. Нужно стимулировать, ребёнок уже перезревает.»',
+        facts: [
+          { icon: '📅', text: 'Срок: 40 недель 3 дня' },
+          { icon: '💓', text: 'КТГ в норме, шевеления активные' },
+          { icon: '🤰', text: 'Здоровье матери в порядке, нет гестоза' },
+          { icon: '💧', text: 'Количество вод нормальное' }
+        ],
+        correct: 'wait',
+        choices: [
+          { id: 'wait', type: 'wait', icon: '📅', title: 'Дождаться спонтанных родов', desc: 'Срок в пределах нормы, всё стабильно' },
+          { id: 'act', type: 'act', icon: '💉', title: 'Согласиться на индукцию', desc: 'ПДР прошла — дальше ждать опасно' },
+          { id: 'ask', type: 'ask', icon: '❓', title: 'Уточнить: почему именно сейчас?', desc: 'Спросить, на основании чего решение' }
+        ],
+        feedback: {
+          wait: { correct: true, title: '✅ Верно — можно ждать', text: 'Окно нормальных родов — 37–41+6 недель. 40 недель 3 дня — это середина нормы. ПДР приблизительна (погрешность ±2 недели). Плод стабилен, здоровье в порядке. Роды запускает ребёнок, когда готов.' },
+          act: { correct: false, title: '❌ Индукция преждевременна', text: 'ПДР — не дедлайн. Окно нормы — 37–41+6 недель. При 40+3 ребёнок не «перезревает». Индукция обоснована после 41 недели (риск статистически растёт), или при проблемах со здоровьем, или при страдании плода. Здесь ничего из этого нет.' },
+          ask: { correct: true, title: '✅ Правильный вопрос', text: 'Важно спросить: как точно рассчитан срок? (Первый скрининг точнее всего.) Есть ли конкретные показания, кроме «прошла ПДР»? В данной ситуации показаний для индукции нет.' }
+        },
+        pran: [
+          'Как точно рассчитан срок (на основании какого УЗИ)?',
+          'Какие конкретные показания для индукции, кроме ПДР?',
+          'Можно ли дождаться спонтанного начала при регулярном контроле КТГ?'
+        ],
+        myth: '📅 ПДР — не дедлайн. Окно нормы — 5 недель (37–41+6). Роды запускает ребёнок, когда созрел. Вес по УЗИ имеет погрешность ±500 г.'
+      }
+    ]
+  }
+];
+
+let mode = 'all';
+let currentScenarios = [];
+let currentIndex = 0;
+let score = 0;
+let results = [];
+let answered = false;
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('modeAll').classList.toggle('active', m === 'all');
+  document.getElementById('modeQuick').classList.toggle('active', m === 'quick');
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startTraining() {
+  score = 0;
+  results = [];
+  answered = false;
+  currentIndex = 0;
+
+  let pool = scenarios.map(s => {
+    const v = s.variants[Math.floor(Math.random() * s.variants.length)];
+    return { ...v, scenarioId: s.id, topic: s.topic, title: s.title };
+  });
+
+  pool = shuffle(pool);
+
+  if (mode === 'quick') {
+    pool = pool.slice(0, 5);
+  }
+
+  currentScenarios = pool;
+  showScenario();
+}
+
+function showWelcome() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('welcomeScreen').classList.add('active');
+  document.getElementById('progressPill').style.display = 'none';
+}
+
+function showScenario() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('scenarioScreen').classList.add('active');
+
+  const pill = document.getElementById('progressPill');
+  pill.style.display = 'block';
+  pill.textContent = (currentIndex + 1) + ' / ' + currentScenarios.length;
+
+  const sc = currentScenarios[currentIndex];
+  answered = false;
+
+  document.getElementById('scenarioBadge').textContent = sc.topic;
+  document.getElementById('scenarioTitle').textContent = sc.title;
+  document.getElementById('doctorText').textContent = sc.doctor;
+
+  const factsEl = document.getElementById('contextFacts');
+  factsEl.innerHTML = sc.facts.map(f =>
+    '<div class="fact"><span class="fact-icon">' + f.icon + '</span><span>' + f.text + '</span></div>'
+  ).join('');
+
+  const choicesEl = document.getElementById('choicesContainer');
+  choicesEl.innerHTML = sc.choices.map(c =>
+    '<button class="choice-btn ' + c.type + '" data-id="' + c.id + '" onclick="selectChoice(\'' + c.id + '\')">' +
+      '<div class="choice-icon">' + c.icon + '</div>' +
+      '<div class="choice-text"><strong>' + c.title + '</strong><span>' + c.desc + '</span></div>' +
+    '</button>'
+  ).join('');
+
+  document.getElementById('feedbackBox').className = 'feedback-box';
+  document.getElementById('pranHint').className = 'pran-hint';
+  document.getElementById('mythBox').className = 'myth-box';
+  document.getElementById('nextBtn').className = 'next-btn';
+}
+
+function selectChoice(choiceId) {
+  if (answered) return;
+  answered = true;
+
+  const sc = currentScenarios[currentIndex];
+  const fb = sc.feedback[choiceId];
+  const isCorrect = fb.correct;
+
+  if (isCorrect) score++;
+
+  results.push({
+    topic: sc.topic,
+    title: sc.title,
+    correct: isCorrect,
+    chosen: choiceId,
+    expected: sc.correct
+  });
+
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(btn => {
+    const id = btn.dataset.id;
+    btn.classList.add('disabled');
+    if (id === choiceId) {
+      btn.classList.add(isCorrect ? 'selected-correct' : 'selected-wrong');
+    }
+    if (!isCorrect && sc.feedback[id] && sc.feedback[id].correct) {
+      btn.classList.add('was-correct');
+    }
+  });
+
+  const fbBox = document.getElementById('feedbackBox');
+  fbBox.className = 'feedback-box visible ' + (isCorrect ? 'correct' : 'wrong');
+  document.getElementById('fbTitle').textContent = fb.title;
+  document.getElementById('fbText').textContent = fb.text;
+
+  if (sc.pran && sc.pran.length) {
+    const pranEl = document.getElementById('pranHint');
+    pranEl.className = 'pran-hint visible';
+    document.getElementById('pranQuestions').innerHTML = sc.pran.map(q =>
+      '<div class="ph-item">' + q + '</div>'
+    ).join('');
+  }
+
+  if (sc.myth) {
+    const mythEl = document.getElementById('mythBox');
+    mythEl.className = 'myth-box visible';
+    mythEl.innerHTML = sc.myth;
+  }
+
+  document.getElementById('nextBtn').className = 'next-btn visible';
+  document.getElementById('nextBtn').textContent =
+    currentIndex < currentScenarios.length - 1 ? 'Следующий сценарий →' : 'Посмотреть результаты →';
+}
+
+function nextScenario() {
+  currentIndex++;
+  if (currentIndex < currentScenarios.length) {
+    showScenario();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    showResults();
+  }
+}
+
+function showResults() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('resultsScreen').classList.add('active');
+  document.getElementById('progressPill').style.display = 'none';
+
+  const total = currentScenarios.length;
+  const pct = Math.round(score / total * 100);
+
+  const circle = document.getElementById('scoreCircle');
+  document.getElementById('scoreNum').textContent = score;
+  document.getElementById('scoreDenom').textContent = 'из ' + total;
+
+  if (pct >= 80) {
+    circle.style.background = 'linear-gradient(135deg, #e6f2e8, #b2d6b8)';
+    circle.style.color = '#2e6636';
+    document.getElementById('resultsTitle').textContent = 'Отличная подготовка!';
+    document.getElementById('resultsSubtitle').textContent = 'Вы хорошо понимаете, когда можно подождать, а когда действовать. Метод ПРАН работает.';
+  } else if (pct >= 50) {
+    circle.style.background = 'linear-gradient(135deg, #fdf3e3, #f0c97a)';
+    circle.style.color = '#a05e0a';
+    document.getElementById('resultsTitle').textContent = 'Хорошее начало';
+    document.getElementById('resultsSubtitle').textContent = 'Некоторые ситуации оказались непростыми. Изучите справочник и попробуйте ещё раз.';
+  } else {
+    circle.style.background = 'linear-gradient(135deg, #fceaea, #f0b4b4)';
+    circle.style.color = '#b52b2b';
+    document.getElementById('resultsTitle').textContent = 'Стоит подготовиться лучше';
+    document.getElementById('resultsSubtitle').textContent = 'Рекомендуем внимательно изучить справочник — там разобраны все 11 сценариев с маркерами и вопросами врачу.';
+  }
+
+  const listEl = document.getElementById('resultsList');
+  listEl.innerHTML = results.map(r =>
+    '<div class="result-item ' + (r.correct ? 'ri-correct' : 'ri-wrong') + '">' +
+      '<div class="ri-icon">' + (r.correct ? '✅' : '❌') + '</div>' +
+      '<div class="ri-text"><strong>' + r.topic + '</strong><span>' + r.title + '</span></div>' +
+    '</div>'
+  ).join('');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
