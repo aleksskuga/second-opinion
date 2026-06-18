@@ -64,10 +64,28 @@
 - Mobile-first дизайн (оптимизирован под телефон)
 - Работает офлайн — один файл, открывается локально
 - Нет бэкенда, данные хранятся только в памяти браузера
+- Android-обёртка: Kotlin + WebView, Gradle, minSdk 24 (Android 7.0+)
 
 ## Использование
 
-Открыть `akusher_prod_v5.html` в браузере телефона. Можно сохранить на главный экран как PWA-подобное приложение.
+### Веб-версия
+Открыть `akusher_prod_v5.html` в браузере телефона.
+
+### Android-приложение
+
+**Скачать готовый APK:** перейти в [Actions](../../actions) → последний успешный билд → скачать артефакт `second-opinion-debug`.
+
+**Собрать самостоятельно:**
+
+```bash
+# Требуется: JDK 17, Android SDK
+cd android
+./gradlew assembleDebug
+```
+
+APK будет в `android/app/build/outputs/apk/debug/app-debug.apk`.
+
+**Или открыть в Android Studio:** File → Open → выбрать папку `android/`.
 
 ## Дисклеймер
 

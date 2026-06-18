@@ -1,0 +1,1510 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Второе мнение · Акушер в роддоме</title>
+<style>
+  :root {
+    --sage: #3d6b5e;
+    --sage-light: #e8f0ed;
+    --sage-mid: #b2cec7;
+    --red: #b52b2b;
+    --red-light: #fceaea;
+    --amber: #a05e0a;
+    --amber-light: #fdf3e3;
+    --green: #2e6636;
+    --green-light: #e6f2e8;
+    --violet: #4b3a8a;
+    --violet-light: #e9e6f5;
+    --text: #1a1a1a;
+    --muted: #666;
+    --border: #ddd;
+    --bg: #f5f3ef;
+    --card: #fff;
+    --radius: 14px;
+    --font: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* TOP BAR */
+  .topbar {
+    background: var(--sage);
+    color: #fff;
+    padding: 0 16px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,.15);
+  }
+  .topbar .logo { font-weight: 700; font-size: 16px; letter-spacing: -.3px; }
+  .topbar .logo span { opacity: .7; font-weight: 400; font-size: 13px; margin-left: 8px; }
+  .topbar .redflags-btn {
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: opacity .15s;
+  }
+  .topbar .redflags-btn:active { opacity: .8; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff;
+    width: 100%;
+    max-width: 600px;
+    border-radius: 18px 18px 0 0;
+    padding: 24px 20px 32px;
+    max-height: 82vh;
+    overflow-y: auto;
+  }
+  .modal h2 { color: var(--red); font-size: 18px; margin-bottom: 14px; }
+  .modal .flag-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0ece6;
+  }
+  .modal .flag-item:last-child { border-bottom: none; }
+  .modal .flag-icon { font-size: 20px; flex-shrink: 0; }
+  .modal .flag-text { font-size: 15px; line-height: 1.4; }
+  .modal .flag-text small { display:block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+  .modal .close-btn {
+    width: 100%;
+    margin-top: 18px;
+    padding: 13px;
+    background: var(--sage);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* MAIN */
+  .main { padding: 16px; max-width: 720px; margin: 0 auto; }
+
+  /* PRAN CARD */
+  .pran-card {
+    background: linear-gradient(135deg, #3d6b5e 0%, #2f5448 100%);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 18px 18px 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 18px rgba(61,107,94,.28);
+  }
+  .pran-card h3 { font-size: 17px; margin-bottom: 4px; }
+  .pran-card .pran-sub { font-size: 13px; opacity: .85; line-height: 1.4; margin-bottom: 14px; }
+  .pran-step {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-top: 1px solid rgba(255,255,255,.16);
+  }
+  .pran-letter {
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    background: rgba(255,255,255,.16);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 17px; flex-shrink: 0;
+  }
+  .pran-body b { display: block; font-size: 14.5px; }
+  .pran-body span { font-size: 13px; opacity: .9; line-height: 1.4; }
+  .pran-wait {
+    margin-top: 14px;
+    background: rgba(255,255,255,.12);
+    border-radius: 10px;
+    padding: 11px 13px;
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+  .pran-wait b { color: #ffe9b0; }
+
+  /* SCENARIO CARDS */
+  .scenario-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    transition: box-shadow .2s;
+  }
+  .scenario-card.active { box-shadow: 0 4px 24px rgba(61,107,94,.18); border-color: var(--sage-mid); }
+
+  .card-header {
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .card-header:active { background: #f7f5f2; }
+  .card-num {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--sage-light);
+    color: var(--sage);
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .active .card-num { background: var(--sage); color: #fff; }
+  .card-title { font-weight: 600; font-size: 15px; flex: 1; line-height: 1.3; }
+  .card-arrow { color: var(--muted); font-size: 18px; transition: transform .2s; flex-shrink: 0; }
+  .active .card-arrow { transform: rotate(180deg); color: var(--sage); }
+
+  .card-body { display: none; padding: 0 16px 16px; }
+  .active .card-body { display: block; }
+
+  /* BRANCHES */
+  .branches { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+  .branch {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1.5px solid var(--border);
+  }
+  .branch-header {
+    padding: 11px 14px;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .branch-header:active { opacity: .85; }
+  .branch-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+  .branch-a .branch-label { background: #e8f0ed; color: var(--sage); }
+  .branch-b .branch-label { background: #e9e6f5; color: var(--violet); }
+  .branch-desc { font-size: 13.5px; line-height: 1.4; color: var(--text); }
+  .branch-expand { font-size: 15px; color: var(--muted); margin-left: auto; transition: transform .2s; flex-shrink: 0; }
+  .branch.open .branch-expand { transform: rotate(180deg); }
+
+  .branch-detail { display: none; padding: 0 14px 14px; }
+  .branch.open .branch-detail { display: block; }
+
+  /* MARKER CHECKLIST */
+  .markers-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 8px; }
+  .marker-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid #f0ece8;
+    cursor: pointer;
+  }
+  .marker-item:last-child { border-bottom: none; }
+  .marker-cb {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--sage-mid);
+    border-radius: 5px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s;
+    background: #fff;
+  }
+  .marker-item.checked .marker-cb {
+    background: var(--sage);
+    border-color: var(--sage);
+  }
+  .marker-item.checked .marker-cb::after {
+    content: '✓';
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .marker-text { font-size: 14px; line-height: 1.4; }
+  .marker-hint { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ACTION BOX */
+  .action-box {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1.5px solid transparent;
+    transition: all .25s;
+  }
+  .action-box.wait { background: var(--green-light); border-color: #b2d6b8; color: var(--green); }
+  .action-box.watch { background: var(--amber-light); border-color: #f0c97a; color: var(--amber); }
+  .action-box.escalate { background: var(--red-light); border-color: #f0b4b4; color: var(--red); }
+  .action-box .action-icon { font-size: 18px; margin-right: 6px; }
+  .action-box .action-label { font-weight: 700; display: block; margin-bottom: 4px; }
+  .action-box.hidden { opacity: .35; background: #f5f3ef; border-color: var(--border); color: var(--muted); }
+  .action-box.hidden .action-label::before { content: 'Отметьте маркеры для рекомендации'; font-weight: 400; }
+
+  /* QUESTIONS */
+  .questions-block { margin-top: 12px; }
+  .questions-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 7px; }
+  .q-item {
+    font-size: 13px;
+    padding: 7px 0;
+    border-bottom: 1px solid #f0ece8;
+    color: #444;
+    line-height: 1.4;
+    padding-left: 14px;
+    position: relative;
+  }
+  .q-item:last-child { border-bottom: none; }
+  .q-item::before { content: '?'; position: absolute; left: 0; color: var(--sage); font-weight: 700; }
+
+  /* NOTES */
+  .info-note {
+    background: #f0ece8;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: #5a5040;
+    margin-top: 10px;
+    line-height: 1.45;
+  }
+  .info-note strong { color: #3a2e20; }
+  .myth-note {
+    background: var(--violet-light);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: #382c63;
+    margin-top: 10px;
+    line-height: 1.45;
+  }
+  .myth-note strong { color: var(--violet); }
+
+  /* TIMER */
+  .timer-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .timer-label { font-size: 13px; color: var(--muted); }
+  .timer-display { font-size: 24px; font-weight: 700; color: var(--sage); font-variant-numeric: tabular-nums; }
+  .timer-btns { display: flex; gap: 8px; margin-left: auto; }
+  .timer-btns button {
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1.5px solid var(--sage-mid);
+    background: #fff;
+    color: var(--sage);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .timer-btns button.start { background: var(--sage); color: #fff; border-color: var(--sage); }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--muted);
+    margin: 18px 0 10px;
+  }
+
+  /* REF CHIPS */
+  .ref-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+  .ref-chip {
+    background:#fff; border:1.5px solid var(--sage-mid); border-radius:999px;
+    padding:5px 11px; font-size:12.5px; color:var(--sage); font-weight:600;
+  }
+
+  .bottom-space { height: 40px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">Акушерство <span>Второе мнение</span></div>
+  <button class="redflags-btn" onclick="openFlags()">🚨 Стоп-сигналы</button>
+</div>
+
+<!-- RED FLAGS MODAL -->
+<div class="modal-overlay" id="flagsModal" onclick="closeFlags(event)">
+  <div class="modal">
+    <h2>🚨 Стоп-сигналы — немедленно звать врача</h2>
+    <div class="flag-item"><div class="flag-icon">🩸</div><div class="flag-text">Сильное вагинальное кровотечение<small>Алой кровью, вне слизистой пробки. Пробка («сопля» с прожилками) — это норма, кровотечение — нет.</small></div></div>
+    <div class="flag-item"><div class="flag-icon">🌡️</div><div class="flag-text">Температура тела выше 38 °C<small>Главный признак инфекции, особенно на фоне безводного периода. Срочно в роддом.</small></div></div>
+    <div class="flag-item"><div class="flag-icon">🪢</div><div class="flag-text">Выпадение петель пуповины<small>Редко, но крайне опасно (вплоть до летального). Чаще сразу после отхождения вод при высоко стоящей головке — поэтому после вод обязателен осмотр.</small></div></div>
+    <div class="flag-item"><div class="flag-icon">💚</div><div class="flag-text">Тёмно-зелёные / коричневые («болотные») воды + продолжающийся дистресс плода<small>Выраженный меконий и ребёнок продолжает страдать по КТГ.</small></div></div>
+    <div class="flag-item"><div class="flag-icon">💓</div><div class="flag-text">Патологическое сердцебиение плода<small>Стойкая брадикардия (ниже 110 уд/мин и не возвращается), поздние децелерации или монотонная КТГ без вариабельности.</small></div></div>
+    <div class="flag-item"><div class="flag-icon">🧠</div><div class="flag-text">Судороги, потеря сознания, острые неврологические симптомы матери</div></div>
+    <div class="flag-item"><div class="flag-icon">🔝</div><div class="flag-text">Тяжёлая гипертензия (систолическое ≥160) + головная боль / нарушение зрения</div></div>
+    <div class="flag-item"><div class="flag-icon">⚡</div><div class="flag-text">Подозрение на отслойку плаценты: резкая постоянная боль, «доска»-матка, кровотечение</div></div>
+    <div class="info-note" style="margin-top:14px;"><strong>Важно про сердцебиение:</strong> если ЧСС плода периодически западает и возвращается — можно наблюдать в диалоге с врачом. Если падает и <strong>остаётся низким</strong> — это повод для экстренной помощи.</div>
+    <button class="close-btn" onclick="closeFlags()">Понятно, закрыть</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ПРАН METHOD -->
+  <div class="section-label">Главный метод · оценка любого вмешательства</div>
+  <div class="pran-card">
+    <h3>Метод ПРАН</h3>
+    <div class="pran-sub">Прежде чем согласиться на любую манипуляцию или препарат (окситоцин, амниотомия, эпидуралка, кесарево), задайте врачу 4 вопроса. Не отказывайте себе в нужной помощи — но и не соглашайтесь на всё подряд.</div>
+
+    <div class="pran-step">
+      <div class="pran-letter">П</div>
+      <div class="pran-body"><b>Польза</b><span>Какие показания? Для чего это именно мне сейчас? Какая польза для меня и ребёнка?</span></div>
+    </div>
+    <div class="pran-step">
+      <div class="pran-letter">Р</div>
+      <div class="pran-body"><b>Риски</b><span>Какие риски у этого вмешательства? (даже у рутинного окситоцина есть редкие, но серьёзные риски)</span></div>
+    </div>
+    <div class="pran-step">
+      <div class="pran-letter">А</div>
+      <div class="pran-body"><b>Альтернатива</b><span>Есть ли другой способ? Что ещё можно сделать вместо этого?</span></div>
+    </div>
+    <div class="pran-step">
+      <div class="pran-letter">Н</div>
+      <div class="pran-body"><b>Ничего</b><span>Что будет, если не делать ничего? Каковы последствия ожидания?</span></div>
+    </div>
+
+    <div class="pran-wait">
+      Если разобрались, но решение не приходит — спросите: <b>«А можно подождать?»</b><br>
+      • Пограничная КТГ (не критично) → можно подождать <b>~30 минут</b>: сменить позу, подышать, открыть окно. Не улучшилось — действуем.<br>
+      • Фаза замедления / медленный прогресс при стабильном плоде → можно попросить <b>1–2 часа</b>.<br>
+      Помните: врач опирается на статистику «средних женщин», а вы — конкретная женщина со своим анамнезом и своим ребёнком.
+    </div>
+  </div>
+
+  <!-- TIMERS -->
+  <div class="section-label">Таймеры и счётчик схваток</div>
+
+  <!-- безводный период -->
+  <div class="timer-block">
+    <div>
+      <div class="timer-label">Безводный период (с момента отхождения вод)</div>
+      <div class="timer-display" id="timerDisplay">00:00:00</div>
+    </div>
+    <div class="timer-btns">
+      <button class="start" id="timerStartBtn" onclick="timerToggle()">▶ Старт</button>
+      <button onclick="timerReset()">Сброс</button>
+    </div>
+  </div>
+  <div class="info-note" style="margin-top:-6px;margin-bottom:14px;">
+    <strong>Что контролировать в безводном периоде:</strong> температуру тела (рост = инфекция → в роддом), КТГ на следующий день после отхождения вод, лейкоциты в общем анализе крови (растут при воспалении), активность ребёнка. <strong>Российский протокол 2021 не устанавливает жёсткий часовой лимит;</strong> мировая практика — до 72 ч при стабильных показателях. «12 часов» или «24 часа» от конкретного врача — это его личная практика, а не стандарт. Воды обновляются каждые ~3 часа — <strong>важно пить</strong>.
+  </div>
+
+  <!-- счётчик схваток -->
+  <div class="timer-block" style="flex-wrap:wrap;gap:12px;">
+    <div style="flex:1;min-width:160px;">
+      <div class="timer-label">Схватки за последние 10 минут</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
+        <div class="timer-display" id="contrCount" style="font-size:36px;">0</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.4;">норма в активной фазе:<br><strong style="color:var(--sage);">3–5 схваток / 10 мин</strong></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;justify-content:center;">
+      <button onclick="contractionTap()" style="background:var(--sage);color:#fff;border:none;border-radius:12px;padding:16px 28px;font-size:17px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:transform .1s;-webkit-tap-highlight-color:transparent;" id="contrBtn">+ Схватка</button>
+      <div style="display:flex;gap:8px;">
+        <button onclick="contrReset()" style="padding:7px 14px;border-radius:8px;border:1.5px solid var(--sage-mid);background:#fff;color:var(--sage);font-size:13px;font-weight:600;cursor:pointer;">Сброс</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- лог схваток -->
+  <div id="contrLog" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;">
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px;">Последние схватки</div>
+    <div id="contrLogList" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+    <div id="contrFreqNote" style="margin-top:10px;font-size:13px;"></div>
+  </div>
+
+  <div class="info-note" style="margin-top:-6px;margin-bottom:14px;">
+    <strong>Правило 5-1-1 — когда ехать в роддом:</strong> интервал между схватками <strong>5 минут</strong>, длительность каждой ~<strong>1 минута</strong>, и так держится <strong>1 час</strong> (и нет кровотечения). Учитывайте пробки, пересменку врачей (≈8:00 и 16:00–18:00) и часы плановой госпитализации. Едьте тогда, когда вы понимаете, что правда пора — а не потому что испугались.
+    <div class="ref-row">
+      <span class="ref-chip">ЧСС плода норма: 110–159 уд/мин</span>
+      <span class="ref-chip">Полное раскрытие: 10 см</span>
+      <span class="ref-chip">Норма родов: 37–41+6 нед</span>
+    </div>
+  </div>
+
+  <!-- LEXICON -->
+  <div class="section-label">Словарик терминов</div>
+  <div class="scenario-card" id="lexiconCard">
+    <div class="card-header" onclick="toggleCard('lexiconCard')">
+      <div class="card-num">i</div>
+      <div class="card-title">Определения терминов, используемых на странице</div>
+      <div class="card-arrow">⌄</div>
+    </div>
+    <div class="card-body">
+      <div class="branches">
+        <div class="branch open" style="border-color: var(--sage-mid);">
+          <div class="branch-header" onclick="toggleBranch('lex1')">
+            <span class="branch-label">Словарь</span>
+            <span class="branch-desc">Краткие объяснения терминов, которые встречаются в сценариях</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail" id="lex1" style="display:block;">
+            <div class="markers-title">Термины</div>
+            <div class="q-item"><b>Правило 5-1-1</b> — критерий перехода в активную фазу и сигнал ехать в роддом: схватки каждые 5 минут, по 1 минуте, в течение 1 часа.</div>
+            <div class="q-item"><b>Безводный период</b> — время от отхождения вод до рождения ребёнка. Чем дольше длится, тем важнее следить за температурой, лейкоцитами и состоянием ребёнка (риск восходящей инфекции).</div>
+            <div class="q-item"><b>Кардиотокография (КТГ)</b> — два датчика: один пишет силу схваток, второй — сердцебиение плода. Норма ЧСС 110–159 уд/мин, вариабельность (то выше, то ниже) — это хорошо.</div>
+            <div class="q-item"><b>Монотонная КТГ</b> — сердцебиение всё время держится «ровной линией» без колебаний. Это не норма, а повод выяснить, почему малыш «подвис».</div>
+            <div class="q-item"><b>Дистресс плода</b> — признаки того, что ребёнку не хватает кислорода или нужна срочная переоценка состояния.</div>
+            <div class="q-item"><b>Переходная фаза</b> — короткий промежуток после полного раскрытия (10 см), когда тужиться ещё рано: головка должна опуститься и прижаться к тазовому дну. Длится 30 минут – 2 часа.</div>
+            <div class="q-item"><b>Фаза замедления</b> — пауза в схватках (часто на 7–10 см) на 1–2 часа: тело «отдыхает» перед потугами. В протоколах не прописана, но существует и часто является вариантом нормы.</div>
+            <div class="q-item"><b>Амниотомия</b> — вскрытие плодного пузыря врачом. По протоколу делается на полном раскрытии или по показаниям (посмотреть воды). Нельзя при высоко стоящей головке — риск выпадения пуповины.</div>
+            <div class="q-item"><b>Меконий</b> — первородный кал ребёнка. Попадая в воды, окрашивает их в зелёный: значит, в какой-то момент ребёнку было плохо. Не приговор — повод усилить контроль.</div>
+            <div class="q-item"><b>Тахисистолия</b> — слишком частые схватки, обычно более 5 за 10 минут; мешают ребёнку отдыхать между схватками.</div>
+            <div class="q-item"><b>Дискоординация родовой деятельности</b> — схватки очень сильные и болезненные, а раскрытия нет. Одно из реальных показаний к эпидуральной анестезии.</div>
+            <div class="q-item"><b>Эндорфины</b> — собственные обезболивающие гормоны, которые вырабатываются в ответ на боль и достаются и матери, и ребёнку. Эпидуралка «отключает» этот механизм.</div>
+            <div class="q-item"><b>Лейкоциты</b> — клетки крови, растут при воспалении. Их рост — один из признаков инфекции в безводном периоде.</div>
+            <div class="q-item"><b>Истинный узел пуповины</b> — настоящий узел (не «обвитие»). Опасен, только если затягивается (видно по КТГ); по УЗИ почти не диагностируется.</div>
+            <div class="q-item"><b>Короткая пуповина</b> — в отличие от обвития, реально важна: в родах может давать ухудшение КТГ и быть показанием к кесареву.</div>
+            <div class="q-item"><b>Приросшая плацента</b> — не отделяется более 30 минут; может потребовать ручного отделения под наркозом.</div>
+            <div class="q-item"><b>Своевременные роды</b> — роды в сроке 37–41+6 недель (раньше назывались «срочные»). Окно нормы — целых 5 недель.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-note" style="margin-bottom:14px;">
+    <strong>Как читать ветки:</strong> «Можно подождать» — если маркеры подтверждают стабильность и невмешательство допустимо. «Критичнее» — если вероятность согласиться на вмешательство выше или уже есть признаки риска. Рекомендация появляется только после отметки маркеров.
+  </div>
+
+  <!-- SCENARIOS -->
+  <div class="section-label">Предложения врача · проверка второго мнения</div>
+
+  <!-- CARD 1 -->
+  <div class="scenario-card" id="card1">
+    <div class="card-header" onclick="toggleCard('card1')">
+      <div class="card-num">1</div>
+      <div class="card-title">Окситоцин / стимуляция родовой деятельности</div>
+      <div class="card-arrow">⌄</div>
+    </div>
+    <div class="card-body">
+      <div class="branches">
+
+        <div class="branch branch-a" id="b1a">
+          <div class="branch-header" onclick="toggleBranch('b1a')">
+            <span class="branch-label">Можно подождать</span>
+            <span class="branch-desc">Усталость, сонливость, нерегулярные схватки, плод стабилен</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b1a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Есть регулярные схватки и динамика процесса <span class="marker-hint">Не только «час по протоколу» — оцениваем нарастание, поведение роженицы</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b1a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Состояние плода спокойное <span class="marker-hint">ЧСС 110–159 уд/мин, есть вариабельность, нет признаков дистресса</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b1a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Нет красных флагов матери <span class="marker-hint">Нет температуры, кровотечения, постоянной боли</span></div>
+            </div>
+            <div class="action-box hidden" id="action-b1a"></div>
+            <div class="questions-block">
+              <div class="questions-title">Вопросы врачу (метод ПРАН)</div>
+              <div class="q-item">На каком основании предлагается стимуляция: это активная фаза или ещё латентная?</div>
+              <div class="q-item">Это реальная слабость родовой деятельности или фаза замедления?</div>
+              <div class="q-item">Что будет, если подождать? Можно ли дать 1–2 часа?</div>
+            </div>
+            <div class="info-note">😴 Фаза замедления — нормальный вариант: при 8–10 см схватки могут временно прекращаться на 1–2 ч. Протоколы её не предусматривают, но она существует. Тело отдыхает перед потугами.</div>
+            <div class="myth-note">⚠️ Окситоцин делает схватки сильнее и болезненнее → часто тянет за собой эпидуралку → ребёнок может не выдержать → кесарево. Поэтому только по реальным показаниям.</div>
+          </div>
+        </div>
+
+        <div class="branch branch-b" id="b1b">
+          <div class="branch-header" onclick="toggleBranch('b1b')">
+            <span class="branch-label">Критичнее</span>
+            <span class="branch-desc">Схваток нет или они явно неэффективны, прогресс стоит</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b1b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Регулярных схваток действительно нет <span class="marker-hint">Отличать субъективную усталость от объективного отсутствия активности</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b1b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Активная фаза подтверждена, наблюдение уже было достаточным <span class="marker-hint">Не просто 3–4 см и «мы ждём»</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b1b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Плод остаётся стабильным <span class="marker-hint">Без дистресса, нет срочности по плоду</span></div>
+            </div>
+            <div class="action-box hidden" id="action-b1b"></div>
+            <div class="questions-block">
+              <div class="questions-title">Вопросы врачу</div>
+              <div class="q-item">Были ли предприняты нефармакологические меры — вертикальное положение, движение, гидратация?</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 2 -->
+  <div class="scenario-card" id="card2">
+    <div class="card-header" onclick="toggleCard('card2')">
+      <div class="card-num">2</div>
+      <div class="card-title">Кесарево из-за снижения активности плода</div>
+      <div class="card-arrow">⌄</div>
+    </div>
+    <div class="card-body">
+      <div class="branches">
+
+        <div class="branch branch-a" id="b2a">
+          <div class="branch-header" onclick="toggleBranch('b2a')">
+            <span class="branch-label">Можно подождать</span>
+            <span class="branch-desc">Движений меньше, но объективного дистресса нет, роды близки к завершению</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b2a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Рождение близко: раскрытие полное/почти полное, головка низко <span class="marker-hint">Оценить реальные шансы вагинального завершения</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b2a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">КТГ / ЧСС плода без патологии прямо сейчас <span class="marker-hint">110–159 уд/мин, нет поздних децелераций, нет брадикардии, не монотонная</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b2a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Нет отягощённого анамнеза плода <span class="marker-hint">Нет подтверждённой задержки роста, маловодия, хронической гипоксии</span></div>
+            </div>
+            <div class="action-box hidden" id="action-b2a"></div>
+            <div class="questions-block">
+              <div class="questions-title">Вопросы врачу</div>
+              <div class="q-item">Каков текущий результат КТГ — патологический или пограничный?</div>
+              <div class="q-item">Можно ли подождать 30 минут: сменить позу на бок, подышать, открыть окно?</div>
+              <div class="q-item">Есть ли иные пути быстрого вагинального завершения?</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="branch branch-b" id="b2b">
+          <div class="branch-header" onclick="toggleBranch('b2b')">
+            <span class="branch-label">Критичнее</span>
+            <span class="branch-desc">Высокий риск плода или подтверждённые признаки дистресса</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b2b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Патологическая КТГ с повторяющимися децелерациями <span class="marker-hint">Или стойкая брадикардия ниже 110, которая не возвращается; или монотонная линия</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b2b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Подтверждённый высокий риск: задержка роста, маловодие, хроническая гипоксия</div>
+            </div>
+            <div class="action-box hidden" id="action-b2b"></div>
+            <div class="info-note">💡 Смена позы на бок и кислород могут улучшить КТГ за минуты. На спине показатели часто ухудшаются — это не всегда дистресс.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 3 -->
+  <div class="scenario-card" id="card3">
+    <div class="card-header" onclick="toggleCard('card3')">
+      <div class="card-num">3</div>
+      <div class="card-title">Зелёные воды — кесарево или срочное вмешательство</div>
+      <div class="card-arrow">⌄</div>
+    </div>
+    <div class="card-body">
+      <div class="branches">
+
+        <div class="branch branch-a" id="b3a">
+          <div class="branch-header" onclick="toggleBranch('b3a')">
+            <span class="branch-label">Можно подождать</span>
+            <span class="branch-desc">Зелёные воды, но плод сейчас стабилен, ситуация выровнялась</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b3a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Воды слегка зеленоватые, не тёмно-зелёные/коричневые <span class="marker-hint">Тёмный «болотный» цвет с запахом — другой сценарий (выраженный меконий)</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b3a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">ЧСС плода сейчас в норме <span class="marker-hint">Нет повторяющихся патологических признаков</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b3a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Матери хорошо, температура нормальная</div>
+            </div>
+            <div class="action-box hidden" id="action-b3a"></div>
+            <div class="info-note">💚 Зелёные воды — всегда повод усилить контроль состояния плода, но не автоматическое показание к кесареву. Воды обновляются каждые ~3 часа: ребёнку «сплохело», потом ситуация может выровняться, и роды пройдут хорошо.</div>
+            <div class="myth-note">⚠️ Миф: «зелёные воды = протухли от переношенности». Правда: зелёный цвет даёт меконий — первородный кал; значит, в какой-то момент ребёнку было плохо.</div>
+          </div>
+        </div>
+
+        <div class="branch branch-b" id="b3b">
+          <div class="branch-header" onclick="toggleBranch('b3b')">
+            <span class="branch-label">Критичнее</span>
+            <span class="branch-desc">Тёмно-зелёные/коричневые воды + признаки дистресса плода сохраняются</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b3b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Воды тёмные, с запахом <span class="marker-hint">«Болотный», коричнево-зелёный цвет — признак выраженного мекония</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b3b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Плод продолжает страдать: патологическая ЧСС/КТГ</div>
+            </div>
+            <div class="action-box hidden" id="action-b3b"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 4 -->
+  <div class="scenario-card" id="card4">
+    <div class="card-header" onclick="toggleCard('card4')">
+      <div class="card-num">4</div>
+      <div class="card-title">Амниотомия — вскрытие плодного пузыря</div>
+      <div class="card-arrow">⌄</div>
+    </div>
+    <div class="card-body">
+      <div class="branches">
+
+        <div class="branch branch-a" id="b4a">
+          <div class="branch-header" onclick="toggleBranch('b4a')">
+            <span class="branch-label">Можно подождать</span>
+            <span class="branch-desc">Воды целы, прогресс идёт, мать и плод стабильны</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b4a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Голова низко и плотно прижата <span class="marker-hint">При высоко стоящей головке амниотомия повышает риск выпадения пуповины</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b4a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Нет чёткой клинической причины вскрывать пузырь сейчас <span class="marker-hint">Не «ускорить», а конкретная диагностическая или тактическая необходимость</span></div>
+            </div>
+            <div class="action-box hidden" id="action-b4a"></div>
+            <div class="questions-block">
+              <div class="questions-title">Вопросы врачу (метод ПРАН)</div>
+              <div class="q-item">Что конкретно даст амниотомия, чего нельзя получить при ожидании?</div>
+              <div class="q-item">На каком уровне стоит головка?</div>
+            </div>
+            <div class="info-note">💧 После амниотомии головка давит напрямую на шейку — схватки сразу становятся интенсивнее и болезненнее. «Просто так» для ускорения статистически не помогает.</div>
+          </div>
+        </div>
+
+        <div class="branch branch-b" id="b4b">
+          <div class="branch-header" onclick="toggleBranch('b4b')">
+            <span class="branch-label">Критичнее</span>
+            <span class="branch-desc">Есть конкретная причина: полное раскрытие, нужна оценка вод, голова низко</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b4b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Полное раскрытие или показание посмотреть воды (сомнения по КТГ)</div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b4b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Готовность к мониторингу после вскрытия + головка низко</div>
+            </div>
+            <div class="action-box hidden" id="action-b4b"></div>
+            <div class="info-note">⏱ После амниотомии начинается отсчёт безводного периода — включить таймер выше.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 5 -->
+  <div class="scenario-card" id="card5">
+    <div class="card-header" onclick="toggleCard('card5')">
+      <div class="card-num">5</div>
+      <div class="card-title">Срочно вмешаться из-за безводного периода</div>
+      <div class="card-arrow">⌄</div>
+    </div>
+    <div class="card-body">
+      <div class="branches">
+
+        <div class="branch branch-a" id="b5a">
+          <div class="branch-header" onclick="toggleBranch('b5a')">
+            <span class="branch-label">Можно подождать</span>
+            <span class="branch-desc">Воды прозрачные, температура нормальная, плод стабилен</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b5a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Температура тела матери в норме <span class="marker-hint">Выше 38°C — переходим к ветке «Критичнее»</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b5a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Лейкоциты в норме (если есть анализ) <span class="marker-hint">Рост лейкоцитов = признак воспаления</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b5a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">КТГ / состояние плода без патологии</div>
+            </div>
+            <div class="action-box hidden" id="action-b5a"></div>
+            <div class="info-note">📋 Российский протокол 2021 не устанавливает часовой лимит безводного периода. Мировая практика — до 72 ч при стабильных показателях. «12 часов» или «24 часа» от конкретного врача — это его личная практика, не стандарт. Но ждать без контроля (температура, КТГ, лейкоциты) — безответственно.</div>
+          </div>
+        </div>
+
+        <div class="branch branch-b" id="b5b">
+          <div class="branch-header" onclick="toggleBranch('b5b')">
+            <span class="branch-label">Критичнее</span>
+            <span class="branch-desc">Нарастает температура, признаки инфекции, плод страдает</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b5b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Температура выше 38 °C</div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b5b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Воды с запахом или изменили цвет / растут лейкоциты</div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b5b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Состояние плода или матери ухудшилось</div>
+            </div>
+            <div class="action-box hidden" id="action-b5b"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 6 -->
+  <div class="scenario-card" id="card6">
+    <div class="card-header" onclick="toggleCard('card6')">
+      <div class="card-num">6</div>
+      <div class="card-title">Кесарево из-за «нет прогресса» / затяжных родов</div>
+      <div class="card-arrow">⌄</div>
+    </div>
+    <div class="card-body">
+      <div class="branches">
+
+        <div class="branch branch-a" id="b6a">
+          <div class="branch-header" onclick="toggleBranch('b6a')">
+            <span class="branch-label">Можно подождать</span>
+            <span class="branch-desc">Активная фаза не подтверждена или наблюдение слишком короткое</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b6a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Раскрытие действительно 5+ см и динамика схваток активная <span class="marker-hint">Не просто «у нас уже 3 часа идут роды»</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b6a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Были предприняты поддерживающие меры: движение, поза, питьё</div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b6a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Мать и плод стабильны</div>
+            </div>
+            <div class="action-box hidden" id="action-b6a"></div>
+            <div class="questions-block">
+              <div class="questions-title">Вопросы врачу</div>
+              <div class="q-item">С какого раскрытия считается «отсутствие прогресса» и за какой период?</div>
+              <div class="q-item">Что именно предшествовало: наблюдение, поддержка или сразу — к операции?</div>
+              <div class="q-item">Может быть, это фаза замедления — можно подождать 1–2 часа?</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="branch branch-b" id="b6b">
+          <div class="branch-header" onclick="toggleBranch('b6b')">
+            <span class="branch-label">Критичнее</span>
+            <span class="branch-desc">Активная фаза подтверждена, прогресса нет, есть ухудшение</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b6b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Подлинная остановка активной фазы: 5+ см, регулярные схватки, нет прогресса 4+ ч</div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b6b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Есть ухудшение плода или истощение матери</div>
+            </div>
+            <div class="action-box hidden" id="action-b6b"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 7 -->
+  <div class="scenario-card" id="card7">
+    <div class="card-header" onclick="toggleCard('card7')">
+      <div class="card-num">7</div>
+      <div class="card-title">Фаза замедления — врач предлагает окситоцин</div>
+      <div class="card-arrow">⌄</div>
+    </div>
+    <div class="card-body">
+      <div class="branches">
+
+        <div class="branch branch-a" id="b7a">
+          <div class="branch-header" onclick="toggleBranch('b7a')">
+            <span class="branch-label">Можно подождать</span>
+            <span class="branch-desc">Схватки остановились при 7–10 см, мать и плод стабильны</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b7a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Остановка была — раньше было хорошее раскрытие и прогресс</div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b7a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Плод без дистресса</div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b7a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Матери хорошо, нет температуры, нет кровотечения</div>
+            </div>
+            <div class="action-box hidden" id="action-b7a"></div>
+            <div class="info-note">😴 Фаза замедления не прописана в протоколах — врачи её «лечат» автоматически. Но в норме она длится 1–2 часа, и роды возобновляются сами. Спать, отдыхать, не бояться. Поставьте себе мысленно три восклицательных знака на этой фазе.</div>
+          </div>
+        </div>
+
+        <div class="branch branch-b" id="b7b">
+          <div class="branch-header" onclick="toggleBranch('b7b')">
+            <span class="branch-label">Критичнее</span>
+            <span class="branch-desc">Остановка + ухудшение состояния матери или плода</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b7b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Есть признаки гипоксии плода или патологическая КТГ</div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b7b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Видимое истощение матери, температура, ухудшение самочувствия</div>
+            </div>
+            <div class="action-box hidden" id="action-b7b"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 8 -->
+  <div class="scenario-card" id="card8">
+    <div class="card-header" onclick="toggleCard('card8')">
+      <div class="card-num">8</div>
+      <div class="card-title">Переходная фаза — врач торопит к потугам</div>
+      <div class="card-arrow">⌄</div>
+    </div>
+    <div class="card-body">
+      <div class="branches">
+
+        <div class="branch branch-a" id="b8a">
+          <div class="branch-header" onclick="toggleBranch('b8a')">
+            <span class="branch-label">Можно подождать</span>
+            <span class="branch-desc">10 см, но ощущение «тужит» появляется только на пике схватки</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b8a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Ощущение потуг — только на самом пике, потом пропадает <span class="marker-hint">Ещё рано — голова опускается, нужно время</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b8a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Плод стабилен, нет дистресса</div>
+            </div>
+            <div class="action-box hidden" id="action-b8a"></div>
+            <div class="info-note">🌊 Переходная фаза: от полного раскрытия до «тужить надо прямо сейчас» — 30 мин до 2 часов. Не тужиться раньше времени = сохранить силы для потуг. Тужиться по команде раньше позыва — частая ошибка, отнимающая силы.</div>
+          </div>
+        </div>
+
+        <div class="branch branch-b" id="b8b">
+          <div class="branch-header" onclick="toggleBranch('b8b')">
+            <span class="branch-label">Критичнее</span>
+            <span class="branch-desc">Ощущение давления и позыв с начала и до конца каждой схватки</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b8b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Ощущение «хочется в туалет, прямо сейчас» постоянное, с начала схватки</div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b8b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Плод стабилен, нет признаков дистресса</div>
+            </div>
+            <div class="action-box hidden" id="action-b8b"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 9: ANESTHESIA -->
+  <div class="scenario-card" id="card9">
+    <div class="card-header" onclick="toggleCard('card9')">
+      <div class="card-num">9</div>
+      <div class="card-title">Эпидуральная анестезия / обезболивание</div>
+      <div class="card-arrow">⌄</div>
+    </div>
+    <div class="card-body">
+      <div class="branches">
+
+        <div class="branch branch-a" id="b9a">
+          <div class="branch-header" onclick="toggleBranch('b9a')">
+            <span class="branch-label">Можно подождать</span>
+            <span class="branch-desc">Боль сильная, но переносимая; показаний нет; схватки естественные</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b9a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Нет медицинских показаний <span class="marker-hint">Давление в норме, нет дискоординации, роды не затяжные</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b9a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Боль нарастает постепенно, есть перерывы для отдыха</div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b9a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Роды не на окситоциновой стимуляции <span class="marker-hint">Окситоцин делает схватки невыносимыми и тянет за собой эпидуралку</span></div>
+            </div>
+            <div class="action-box hidden" id="action-b9a"></div>
+            <div class="info-note">💪 Без анестезии за болью «гонятся» эндорфины — собственное обезболивающее, которое достаётся и матери, и ребёнку. Помогают немедикаментозные методы: движение, позы, дыхание, вода, тепло.</div>
+            <div class="myth-note">⚠️ Каскад: окситоцин → невыносимая боль → эпидуралка → нет эндорфинов, плод в стрессе без обезболивания → дистресс → кесарево. Часто запускается без реальных показаний.</div>
+          </div>
+        </div>
+
+        <div class="branch branch-b" id="b9b">
+          <div class="branch-header" onclick="toggleBranch('b9b')">
+            <span class="branch-label">Критичнее</span>
+            <span class="branch-desc">Есть реальные показания к анестезии</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b9b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Высокое артериальное давление / гипертензия <span class="marker-hint">Эпидуралка снижает давление. При низком давлении — противопоказана</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b9b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Дискоординация: схватки сильные и болезненные, а раскрытия нет</div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b9b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Затяжные роды и истощение матери</div>
+            </div>
+            <div class="action-box hidden" id="action-b9b"></div>
+            <div class="info-note">💉 После эпидуралки обязательна непрерывная КТГ — любое вмешательство может повлиять на плод. Возможные последствия процедуры: головные боли, боли в спине.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 10: CORD ENTANGLEMENT -->
+  <div class="scenario-card" id="card10">
+    <div class="card-header" onclick="toggleCard('card10')">
+      <div class="card-num">10</div>
+      <div class="card-title">Обвитие пуповиной — предлагают кесарево</div>
+      <div class="card-arrow">⌄</div>
+    </div>
+    <div class="card-body">
+      <div class="branches">
+
+        <div class="branch branch-a" id="b10a">
+          <div class="branch-header" onclick="toggleBranch('b10a')">
+            <span class="branch-label">Можно подождать</span>
+            <span class="branch-desc">Обвитие по УЗИ, длина пуповины нормальная, КТГ хорошая</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b10a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Это «петли в проекции шеи» по УЗИ, не подтверждённое обвитие <span class="marker-hint">Корректная формулировка УЗИ — именно «петли в проекции шеи»</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b10a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Длина пуповины нормальная (не короткая)</div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b10a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">КТГ в норме сейчас</div>
+            </div>
+            <div class="action-box hidden" id="action-b10a"></div>
+            <div class="myth-note">⚠️ Миф: «обвитие = кесарево» и «пуповина задушит». Правда: пуповина — плотный жёсткий шнур в желеобразной субстанции, она физически не пережимается; кислород идёт через сосуды пуповины, не через горло. Даже 4–5-кратное обвитие при нормальной длине проходит благополучно. Обвитие по УЗИ и обвитие в родах — разные истории.</div>
+          </div>
+        </div>
+
+        <div class="branch branch-b" id="b10b">
+          <div class="branch-header" onclick="toggleBranch('b10b')">
+            <span class="branch-label">Критичнее</span>
+            <span class="branch-desc">Короткая пуповина, ухудшение КТГ, признаки истинного узла</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b10b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Короткая пуповина по УЗИ <span class="marker-hint">В отличие от обвития — реально важный признак</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b10b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Стойкое ухудшение КТГ / повторяющиеся децелерации в родах</div>
+            </div>
+            <div class="action-box hidden" id="action-b10b"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 11: INDUCTION BY TERM -->
+  <div class="scenario-card" id="card11">
+    <div class="card-header" onclick="toggleCard('card11')">
+      <div class="card-num">11</div>
+      <div class="card-title">Индукция (стимуляция) по сроку / ПДР</div>
+      <div class="card-arrow">⌄</div>
+    </div>
+    <div class="card-body">
+      <div class="branches">
+
+        <div class="branch branch-a" id="b11a">
+          <div class="branch-header" onclick="toggleBranch('b11a')">
+            <span class="branch-label">Можно подождать</span>
+            <span class="branch-desc">Срок в пределах нормы, здоровье в порядке, плод благополучен</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b11a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Срок менее 41 недели <span class="marker-hint">Окно нормальных родов — 37–41+6 недель</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b11a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Здоровье в норме: нет воспаления, гестоза, диабета</div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b11a')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">КТГ и состояние плода в норме, шевеления привычные</div>
+            </div>
+            <div class="action-box hidden" id="action-b11a"></div>
+            <div class="questions-block">
+              <div class="questions-title">Вопросы врачу</div>
+              <div class="q-item">Как точно рассчитан мой срок и на основании каких данных (первый скрининг точнее всего)?</div>
+              <div class="q-item">Есть ли в моей ситуации показания дождаться спонтанного начала?</div>
+            </div>
+            <div class="info-note">📅 Роды запускает ребёнок, когда готов. ПДР приблизительна (вес по УЗИ — погрешность ±0,5 кг). Окно нормы — 5 недель.</div>
+          </div>
+        </div>
+
+        <div class="branch branch-b" id="b11b">
+          <div class="branch-header" onclick="toggleBranch('b11b')">
+            <span class="branch-label">Критичнее</span>
+            <span class="branch-desc">41+ неделя, есть заболевания/воспаление или признаки страдания плода</span>
+            <span class="branch-expand">⌄</span>
+          </div>
+          <div class="branch-detail">
+            <div class="markers-title">Проверить маркеры</div>
+            <div class="marker-item" onclick="toggleMarker(this,'b11b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Срок 41 неделя и более <span class="marker-hint">После 41 недели статистика риска для ребёнка растёт; 41 нед — стандартный срок индукции по протоколу</span></div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b11b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Есть проблемы со здоровьем: воспаление, гестоз, диабет</div>
+            </div>
+            <div class="marker-item" onclick="toggleMarker(this,'b11b')">
+              <div class="marker-cb"></div>
+              <div class="marker-text">Признаки страдания плода, маловодие, снижение шевелений</div>
+            </div>
+            <div class="action-box hidden" id="action-b11b"></div>
+            <div class="myth-note">ℹ️ Некоторые женщины естественно ходят до 42–43 недель — но только при полном благополучии и/или неточно известном сроке. При любых проблемах со здоровьем долго ждать не стоит.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ROUTINE PROCEDURES -->
+  <div class="section-label">Рутинные процедуры при поступлении</div>
+  <div class="scenario-card" id="routineCard">
+    <div class="card-header" onclick="toggleCard('routineCard')">
+      <div class="card-num">+</div>
+      <div class="card-title">Катетер, осмотр, КТГ, окситоцин после родов — соглашаться или нет</div>
+      <div class="card-arrow">⌄</div>
+    </div>
+    <div class="card-body">
+      <div class="branches">
+        <div class="branch open" style="border-color: var(--sage-mid);">
+          <div class="branch-detail" style="display:block;padding-top:12px;">
+            <div class="markers-title">Внутривенный катетер</div>
+            <div class="q-item" style="padding-left:0;">Ставят при поступлении. <b>Не стоит отказываться:</b> при внезапном кровотечении вены «схлопываются», и попасть в вену становится крайне трудно. Это не значит, что вам обязательно будут что-то капать — это «доступ» на случай, если помощь понадобится. После установки катетер промывают физраствором, чтобы кровь не свернулась.</div>
+            <div class="q-item" style="padding-left:0;">::before{}</div>
+            <div class="markers-title" style="margin-top:6px;">Влагалищный осмотр</div>
+            <div class="q-item" style="padding-left:0;">Делают всем: при поступлении, далее раз в ~4 часа, перед анестезией и <b>обязательно после отхождения вод</b> (исключить выпадение пуповины). Это единственный способ оценить динамику раскрытия — не отказывайтесь, помогает навык продышать осмотр.</div>
+            <div class="markers-title" style="margin-top:6px;">КТГ</div>
+            <div class="q-item" style="padding-left:0;">Норма ЧСС плода — 110–159 уд/мин, вариабельность это хорошо. Монотонная линия — не норма. Лежать на спине нельзя (показатели ухудшаются) — лучше на боку. Если двигаетесь и датчик «отходит» — придерживайте его рукой. При окситоцине/эпидуралке КТГ пишут непрерывно.</div>
+            <div class="markers-title" style="margin-top:6px;">Окситоцин после родов</div>
+            <div class="q-item" style="padding-left:0;">Капают почти всем для профилактики послеродового кровотечения (критичны первые 2 часа). На ребёнка уже не влияет (он родился), на ощущения матери — слабо. Отказаться можно, если всё хорошо, но ждите активного сопротивления медперсонала — кровотечений очень боятся.</div>
+            <div class="info-note">🤱 Прикладывание ребёнка к груди (или стимуляция сосков) — лучший естественный способ ускорить отделение плаценты и сократить матку. Плацента рождается обычно за 15 минут, по протоколу — до 30 минут.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-space"></div>
+</div>
+
+<script>
+// ── CARD TOGGLE ──
+function toggleCard(id) {
+  document.getElementById(id).classList.toggle('active');
+}
+
+// ── BRANCH TOGGLE ──
+function toggleBranch(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// ── MARKER LOGIC ──
+const actionData = {
+  'b1a': {
+    allChecked: { type:'wait', icon:'😴', label:'Можно выжидать', text:'Ранняя фаза или фаза замедления — нормальный сценарий. Отдых, тепло, питьё, изменение позы. Контролировать динамику. Окситоцин не нужен, пока показания не подтверждены.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Нужна переоценка', text:'Один или несколько маркеров не отмечены. Перепроверить состояние плода и отсутствие красных флагов до принятия решения.' }
+  },
+  'b1b': {
+    allChecked: { type:'watch', icon:'⚖️', label:'Обсудить стимуляцию', text:'Если активная фаза подтверждена и схваток нет — стимуляция может быть обоснована. Уточнить: были ли нефармакологические меры, каков анамнез. Спросить по методу ПРАН.' },
+    notAllChecked: { type:'wait', icon:'⏳', label:'Ещё не все маркеры проверены', text:'Отметьте маркеры для формирования рекомендации.' }
+  },
+  'b2a': {
+    allChecked: { type:'wait', icon:'🐢', label:'Переоценка, не спешить', text:'Рождение близко, дистресса нет. Уместны мягкие меры: смена позы на бок, вода, кислород, повторная КТГ. Можно попросить ~30 минут наблюдения, прежде чем идти к операции.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Нужна переоценка', text:'Отметьте все маркеры для оценки.' }
+  },
+  'b2b': {
+    allChecked: { type:'escalate', icon:'🚨', label:'Соглашаться на кесарево', text:'При подтверждённом дистрессе и высоком риске плода — безопасное быстрое родоразрешение важнее стратегии невмешательства.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Уточнить риски', text:'Проверьте оба маркера.' }
+  },
+  'b3a': {
+    allChecked: { type:'watch', icon:'👁️', label:'Контроль, не операция', text:'Зелёные воды — повод усилить наблюдение, но не автоматическое кесарево. Следить за ЧСС плода на каждом этапе. Воды обновляются ~каждые 3 часа.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Нужна переоценка', text:'Проверьте все маркеры.' }
+  },
+  'b3b': {
+    allChecked: { type:'escalate', icon:'🚨', label:'Срочное родоразрешение', text:'Тёмные воды + продолжающийся дистресс плода = реальный риск. Соглашаться на срочную тактику команды.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Уточнить', text:'Отметьте маркеры.' }
+  },
+  'b4a': {
+    allChecked: { type:'wait', icon:'🫧', label:'Можно выжидать без вскрытия', text:'Если головка низко и есть причина — амниотомия обсуждаема. Если конкретной причины нет — продолжить выжидание. При высоко стоящей головке вскрытие отложить (риск выпадения пуповины).' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Нужна переоценка', text:'Проверьте оба маркера.' }
+  },
+  'b4b': {
+    allChecked: { type:'watch', icon:'⚖️', label:'Амниотомия может быть оправдана', text:'При наличии показаний и низко стоящей головке — амниотомия допустима. После — включить таймер безводного периода и усилить мониторинг.' },
+    notAllChecked: { type:'wait', icon:'⏳', label:'Уточнить показания', text:'Отметьте маркеры.' }
+  },
+  'b5a': {
+    allChecked: { type:'wait', icon:'⏱️', label:'Наблюдать, не торопировать', text:'Стабильные показатели — повода для срочного вмешательства нет. Мировая практика: до 72 ч при отсутствии инфекции и стабильном плоде. Продолжать контроль: температура, КТГ, лейкоциты.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Нужна переоценка', text:'Проверьте маркеры.' }
+  },
+  'b5b': {
+    allChecked: { type:'escalate', icon:'🚨', label:'Активная тактика обязательна', text:'Признаки инфекции и/или ухудшение плода = невмешательство неуместно. Нужна антибиотикотерапия и ускоренное родоразрешение.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Уточнить', text:'Отметьте маркеры.' }
+  },
+  'b6a': {
+    allChecked: { type:'wait', icon:'🤲', label:'Попросить время', text:'Если активная фаза не подтверждена и были поддерживающие меры — можно запросить дополнительный период наблюдения. Мать и плод стабильны. Возможно, это фаза замедления.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Нужна переоценка', text:'Проверьте маркеры.' }
+  },
+  'b6b': {
+    allChecked: { type:'escalate', icon:'🚨', label:'Эскалация обоснована', text:'При подтверждённой остановке активной фазы + ухудшении — отказ от вмешательства теряет смысл. Обсудить окситоцин или кесарево по полной клинической картине.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Уточнить', text:'Отметьте маркеры.' }
+  },
+  'b7a': {
+    allChecked: { type:'wait', icon:'😴', label:'Это норма — отдыхать', text:'Фаза замедления при стабильных мать+плод — физиологический вариант нормы. Спать, расслабиться, закрыть глаза. Схватки возобновятся через 1–2 ч. Протокол её не видит, но она существует.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Нужна переоценка', text:'Проверьте маркеры.' }
+  },
+  'b7b': {
+    allChecked: { type:'escalate', icon:'🚨', label:'Нужна эскалация', text:'Остановка + ухудшение = невмешательство больше не приоритет. Соглашаться на стимуляцию или оперативную тактику.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Уточнить', text:'Отметьте маркеры.' }
+  },
+  'b8a': {
+    allChecked: { type:'wait', icon:'🌊', label:'Ещё рано тужиться', text:'Голова ещё опускается. Продолжать дышать, двигаться, не тужиться. Ощущение потуг только на пике — это переходная фаза, не призыв к действию.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Нужна переоценка', text:'Проверьте маркеры.' }
+  },
+  'b8b': {
+    allChecked: { type:'watch', icon:'✅', label:'Пора звать персонал', text:'Постоянное давление с начала схватки = голова опустилась. Можно и нужно звать акушерку/врача и переходить к потугам. Внизу расслабить, не кричать.' },
+    notAllChecked: { type:'wait', icon:'⏳', label:'Ждать нарастания ощущений', text:'Ощущение потуг ещё не постоянное — продолжать дышать и ждать.' }
+  },
+  'b9a': {
+    allChecked: { type:'wait', icon:'💪', label:'Анестезия не нужна', text:'Показаний нет, схватки естественные. Работают эндорфины (для матери и ребёнка). Использовать немедикаментозное обезболивание: движение, позы, дыхание, тепло, вода.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Нужна переоценка', text:'Проверьте маркеры.' }
+  },
+  'b9b': {
+    allChecked: { type:'watch', icon:'💉', label:'Анестезия обоснована', text:'Есть реальные показания (давление / дискоординация / затяжные роды). Согласиться. После — непрерывная КТГ. При низком давлении эпидуралка противопоказана.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Уточнить показания', text:'Отметьте маркеры.' }
+  },
+  'b10a': {
+    allChecked: { type:'wait', icon:'🪢', label:'Обвитие — не показание к КС', text:'Обычное обвитие при нормальной длине пуповины и хорошей КТГ не требует кесарева. Пуповина не пережимается. Можно планировать роды через естественные пути под контролем КТГ.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Нужна переоценка', text:'Проверьте маркеры.' }
+  },
+  'b10b': {
+    allChecked: { type:'escalate', icon:'🚨', label:'Риск реален', text:'Короткая пуповина + стойкое ухудшение КТГ (или признаки истинного узла) — реальное показание. Согласиться на кесарево / срочное завершение по решению команды.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Уточнить', text:'Отметьте маркеры.' }
+  },
+  'b11a': {
+    allChecked: { type:'wait', icon:'📅', label:'Можно дождаться спонтанных родов', text:'Срок в окне нормы (37–41+6), здоровье и плод в порядке. Роды запускает ребёнок. Обсудить с врачом наблюдение вместо немедленной индукции.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Нужна переоценка', text:'Проверьте маркеры.' }
+  },
+  'b11b': {
+    allChecked: { type:'escalate', icon:'🚨', label:'Индукция обоснована', text:'После 41 недели риск для ребёнка растёт (статистически вдвое), а при проблемах со здоровьем/страдании плода ждать опасно. Индукция оправдана.' },
+    notAllChecked: { type:'watch', icon:'👁️', label:'Уточнить', text:'Отметьте маркеры.' }
+  }
+};
+
+function toggleMarker(el, branchId) {
+  el.classList.toggle('checked');
+  updateAction(branchId);
+}
+
+function updateAction(branchId) {
+  const branch = document.getElementById(branchId);
+  const markers = branch.querySelectorAll('.marker-item');
+  const actionBox = branch.querySelector('.action-box');
+  const data = actionData[branchId];
+  if (!data) return;
+  const allChecked = Array.from(markers).every(m => m.classList.contains('checked'));
+  const anyChecked = Array.from(markers).some(m => m.classList.contains('checked'));
+  if (!anyChecked) {
+    actionBox.className = 'action-box hidden';
+    actionBox.innerHTML = '';
+    return;
+  }
+  const d = allChecked ? data.allChecked : data.notAllChecked;
+  actionBox.className = 'action-box ' + d.type;
+  actionBox.innerHTML = '<span class="action-icon">' + d.icon + '</span><span class="action-label">' + d.label + '</span>' + d.text;
+}
+
+// ── TIMER ──
+let timerInterval = null;
+let timerSeconds = 0;
+let timerRunning = false;
+
+function timerToggle() {
+  const btn = document.getElementById('timerStartBtn');
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    btn.textContent = '▶ Старт';
+    btn.classList.remove('start');
+  } else {
+    timerRunning = true;
+    btn.textContent = '⏸ Пауза';
+    btn.classList.add('start');
+    timerInterval = setInterval(() => {
+      timerSeconds++;
+      updateTimerDisplay();
+    }, 1000);
+  }
+}
+
+function timerReset() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = 0;
+  updateTimerDisplay();
+  const btn = document.getElementById('timerStartBtn');
+  btn.textContent = '▶ Старт';
+  btn.classList.add('start');
+}
+
+function updateTimerDisplay() {
+  const h = Math.floor(timerSeconds / 3600);
+  const m = Math.floor((timerSeconds % 3600) / 60);
+  const s = timerSeconds % 60;
+  const display = document.getElementById('timerDisplay');
+  display.textContent = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  display.style.color = 'var(--sage)';
+  if (h >= 18) display.style.color = '#a05e0a';
+  if (h >= 24) display.style.color = '#b52b2b';
+}
+
+// ── CONTRACTION COUNTER ──
+let contractions = [];
+
+function contractionTap() {
+  const btn = document.getElementById('contrBtn');
+  btn.style.transform = 'scale(.95)';
+  setTimeout(() => btn.style.transform = '', 120);
+  const now = Date.now();
+  contractions.push(now);
+  contractions = contractions.filter(t => now - t <= 30 * 60 * 1000);
+  updateContrDisplay();
+}
+
+function contrReset() {
+  contractions = [];
+  updateContrDisplay();
+}
+
+function updateContrDisplay() {
+  const now = Date.now();
+  const last10 = contractions.filter(t => now - t <= 10 * 60 * 1000);
+  const count = last10.length;
+  const el = document.getElementById('contrCount');
+  el.textContent = count;
+  if (count === 0) { el.style.color = 'var(--sage)'; }
+  else if (count < 3) { el.style.color = 'var(--amber)'; }
+  else if (count <= 5) { el.style.color = 'var(--green)'; }
+  else { el.style.color = 'var(--red)'; }
+
+  const log = document.getElementById('contrLog');
+  const list = document.getElementById('contrLogList');
+  const note = document.getElementById('contrFreqNote');
+
+  if (contractions.length === 0) {
+    log.style.display = 'none';
+    return;
+  }
+  log.style.display = 'block';
+
+  const recent = [...contractions].reverse().slice(0, 10);
+  list.innerHTML = recent.map((t, i) => {
+    const d = new Date(t);
+    const hh = String(d.getHours()).padStart(2,'0');
+    const mm = String(d.getMinutes()).padStart(2,'0');
+    const ss = String(d.getSeconds()).padStart(2,'0');
+    let interval = '';
+    if (i < recent.length - 1) {
+      const diff = Math.round((recent[i] - recent[i+1]) / 1000);
+      const dm = Math.floor(diff / 60);
+      const ds = diff % 60;
+      interval = `<span style="font-size:11px;color:var(--muted);display:block;">↑ ${dm}м ${ds}с</span>`;
+    }
+    return `<div style="background:#f5f3ef;border-radius:8px;padding:6px 10px;text-align:center;font-size:13px;font-weight:600;">${hh}:${mm}:${ss}${interval}</div>`;
+  }).join('');
+
+  if (count < 2) {
+    note.innerHTML = '';
+  } else {
+    const diffs = last10.map((t,i) => i < last10.length-1 ? t - last10[i+1] : null).filter(Boolean);
+    if (diffs.length) {
+      const avg = Math.round(diffs.reduce((a,b) => a+b, 0) / diffs.length / 1000);
+      const am = Math.floor(avg / 60);
+      const as2 = avg % 60;
+      let statusText = '';
+      if (count < 3) statusText = '<span style="color:var(--amber)">⚠ Мало схваток для активной фазы (норма 3–5 за 10 мин)</span>';
+      else if (count <= 5) statusText = '<span style="color:var(--green)">✓ Нормальная активная фаза</span>';
+      else statusText = '<span style="color:var(--red)">⚠ Тахисистолия — более 5 схваток за 10 мин, сообщить врачу</span>';
+      let ruleText = '';
+      if (avg <= 330 && count >= 3) {
+        ruleText = '<br><span style="color:var(--sage)">📍 Интервалы как по правилу 5-1-1 — если так держится час, пора в роддом</span>';
+      }
+      note.innerHTML = `Средний интервал: <strong>${am}м ${as2}с</strong> &nbsp;·&nbsp; ${statusText}${ruleText}`;
+    }
+  }
+}
+
+setInterval(() => {
+  if (contractions.length > 0) updateContrDisplay();
+}, 30000);
+
+// ── FLAGS MODAL ──
+function openFlags() {
+  document.getElementById('flagsModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeFlags(e) {
+  if (!e || e.target === document.getElementById('flagsModal')) {
+    document.getElementById('flagsModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+</script>
+</body>
+</html>
