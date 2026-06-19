@@ -439,6 +439,58 @@
   }
 
   .bottom-space { height: 40px; }
+
+  /* GLOSSARY TERMS */
+  .term {
+    color: var(--sage);
+    border-bottom: 1.5px dotted var(--sage-mid);
+    cursor: help;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .term-tip {
+    display: none;
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 8px);
+    transform: translateX(-50%);
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 400;
+    font-style: normal;
+    line-height: 1.4;
+    padding: 10px 14px;
+    border-radius: 10px;
+    width: max-content;
+    max-width: min(320px, 85vw);
+    z-index: 300;
+    box-shadow: 0 4px 16px rgba(0,0,0,.25);
+    pointer-events: none;
+    text-align: left;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .term-tip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1a1a1a;
+  }
+  .term.active .term-tip { display: block; }
+  .term.tip-below .term-tip {
+    bottom: auto;
+    top: calc(100% + 8px);
+  }
+  .term.tip-below .term-tip::after {
+    top: auto;
+    bottom: 100%;
+    border-top-color: transparent;
+    border-bottom-color: #1a1a1a;
+  }
 </style>
 </head>
 <body>
@@ -549,6 +601,96 @@
 </div>
 
 <script>
+// ── GLOSSARY ──
+const W = '[а-яёА-ЯЁa-zA-Z0-9]';
+function g(pat, flags) { return new RegExp('(?<!' + W + ')' + pat + '(?!' + W + ')', flags || 'gi'); }
+const glossary = [
+  { pattern: g('КТГ', 'g'), tip: 'Кардиотокография — запись сердцебиения плода и силы схваток двумя датчиками на животе' },
+  { pattern: g('ЧСС', 'g'), tip: 'Частота сердечных сокращений — сколько раз в минуту бьётся сердце плода. Норма: 110–159 уд/мин' },
+  { pattern: g('децелераци[яийюейями]+'), tip: 'Временные падения сердцебиения плода во время или после схватки. Редкие с восстановлением — допустимы, поздние повторяющиеся — тревожный признак' },
+  { pattern: g('вариабельност[ьюи]'), tip: 'Нормальные колебания сердцебиения плода — ритм то чуть быстрее, то медленнее. Это хорошо: значит нервная система ребёнка работает' },
+  { pattern: g('брадикарди[яийюейями]+'), tip: 'Стойкое снижение частоты сердцебиения плода ниже 110 уд/мин. Если не восстанавливается — сигнал к срочным мерам' },
+  { pattern: g('дистресс[аеуом]?\\s*плода'), tip: 'Признаки того, что ребёнку не хватает кислорода: патологическая КТГ, стойкое снижение ЧСС, отсутствие вариабельности' },
+  { pattern: g('дистресс[аеуом]?(?!\\s*плода)'), tip: 'Состояние, при котором ребёнку или матери не хватает ресурсов — кислорода, сил. Требует оценки и, возможно, вмешательства' },
+  { pattern: g('монотонн(ая|ую|ой|ом)'), tip: 'КТГ «ровной линией» без колебаний — сердцебиение плода не меняется. Это НЕ норма: нервная система не реагирует, нужна оценка врачом' },
+  { pattern: g('латентн(ая|ой|ую) фаз[аыеуой]+'), tip: 'Начальная фаза родов: раскрытие шейки матки от 0 до 5–6 см. Может длиться много часов — это нормально' },
+  { pattern: g('активн(ая|ой|ую) фаз[аыеуой]+'), tip: 'Основная фаза родов: раскрытие от 5–6 до 10 см. Идёт быстрее, схватки регулярные и сильные' },
+  { pattern: g('фаз[аыеуой]+ замедлени[яй]'), tip: 'Нормальная пауза при 7–10 см: схватки временно прекращаются на 1–2 часа. Тело отдыхает перед потугами. Не прописана в протоколах, но существует' },
+  { pattern: g('переходн(ая|ой|ую) фаз[аыеуой]+'), tip: 'Промежуток после полного раскрытия (10 см), когда тужиться ещё рано: головка должна опуститься. Длится 30 мин — 2 часа' },
+  { pattern: g('амниотоми[яийюейями]+'), tip: 'Вскрытие плодного пузыря врачом специальным инструментом. После этого начинается безводный период и схватки становятся интенсивнее' },
+  { pattern: g('окситоцин[аеуом]?'), tip: 'Гормон, который вводят через капельницу для усиления схваток. Делает их сильнее и болезненнее, чем естественные' },
+  { pattern: g('эпидуралк[аиуейою]+'), tip: 'Эпидуральная анестезия — обезболивание через тонкий катетер около спинного мозга. Убирает боль, но отключает выработку эндорфинов и требует непрерывного мониторинга' },
+  { pattern: g('эпидуральн(ая|ой|ую|ом)'), tip: 'Анестезия через тонкий катетер около спинного мозга. Убирает боль, но отключает выработку эндорфинов и требует непрерывного мониторинга плода' },
+  { pattern: g('мекони[йяюейями]+'), tip: 'Первородный кал ребёнка. Если попадает в околоплодные воды — окрашивает их в зелёный. Значит, в какой-то момент малышу было плохо' },
+  { pattern: g('дискоординаци[яийюейями]+'), tip: 'Схватки очень сильные и болезненные, а раскрытия шейки матки нет. Одно из реальных показаний к эпидуральной анестезии' },
+  { pattern: g('гестоз[аеуом]?'), tip: 'Осложнение беременности: повышение давления, отёки, белок в моче. Может быть опасно для матери и ребёнка' },
+  { pattern: g('индукци[яийюейями]+'), tip: 'Искусственное начало родов с помощью медикаментов (гель, окситоцин и др.), когда организм сам ещё не запустил процесс' },
+  { pattern: g('ПДР', 'g'), tip: 'Предполагаемая дата родов — приблизительная оценка, погрешность ±2 недели. Не дедлайн, а ориентир' },
+  { pattern: g('маловоди[яеюй]+'), tip: 'Недостаточное количество околоплодных вод. Может указывать на проблемы с плацентой или почками плода' },
+  { pattern: g('безводн(ый|ого|ому|ом) период'), tip: 'Время от отхождения вод до рождения ребёнка. Важно контролировать температуру и состояние плода. Жёсткого часового лимита в протоколах нет' },
+  { pattern: g('эндорфин[аыовами]+'), tip: 'Собственные обезболивающие гормоны организма. Вырабатываются в ответ на боль, достаются и маме, и малышу. Эпидуральная анестезия отключает этот механизм' },
+  { pattern: g('лейкоцит[аыовами]+'), tip: 'Клетки крови, отвечающие за иммунитет. Их рост в анализе — признак воспаления или инфекции' },
+  { pattern: g('гидратаци[яийюейями]+'), tip: 'Достаточное питьё воды. Обезвоживание может замедлить роды и ухудшить самочувствие' },
+  { pattern: g('анамнез[аеуом]?'), tip: 'Медицинская история пациента: прошлые заболевания, беременности, операции, аллергии и другие важные данные' },
+  { pattern: g('потуг[аиыовм]+'), tip: 'Рефлекторные сокращения мышц живота и диафрагмы, которые помогают вытолкнуть ребёнка. Возникают при полном раскрытии, когда головка давит на тазовое дно' },
+  { pattern: g('раскрыти[яеюй]'), tip: 'Раскрытие шейки матки, измеряется в сантиметрах. Полное раскрытие — 10 см. Определяется при влагалищном осмотре' },
+  { pattern: g('нефармакологическ[иеойх]+'), tip: 'Немедикаментозные меры: смена позы, ходьба, дыхание, массаж, вода, тепло — всё, что помогает без лекарств' },
+  { pattern: g('тахисистоли[яийюейями]+'), tip: 'Слишком частые схватки — более 5 за 10 минут. Ребёнок не успевает отдохнуть между ними, что может привести к дистрессу' },
+  { pattern: g('патологическ(ая|ой|ую|им|ом)'), tip: 'Выходящий за границы нормы — тревожный показатель, требующий оценки и, возможно, вмешательства' },
+  { pattern: g('пограничн(ая|ой|ую|ым|ом)'), tip: 'На границе нормы — не критично, но требует наблюдения. В отличие от патологической ситуации, можно подождать и переоценить' },
+  { pattern: g('вагинальн(ого|ое|ому|ым|ом)'), tip: 'Через естественные родовые пути (в отличие от кесарева сечения)' },
+];
+
+function glossarize(text) {
+  const hits = [];
+  const usedTips = new Set();
+  for (const entry of glossary) {
+    entry.pattern.lastIndex = 0;
+    let m;
+    while ((m = entry.pattern.exec(text)) !== null) {
+      if (usedTips.has(entry.tip)) continue;
+      usedTips.add(entry.tip);
+      hits.push({ start: m.index, end: m.index + m[0].length, match: m[0], tip: entry.tip });
+      break;
+    }
+  }
+  if (!hits.length) return text;
+  hits.sort((a, b) => a.start - b.start);
+  const deduped = [];
+  for (const h of hits) {
+    if (deduped.length && h.start < deduped[deduped.length - 1].end) continue;
+    deduped.push(h);
+  }
+  let result = '';
+  let pos = 0;
+  for (const h of deduped) {
+    result += text.slice(pos, h.start);
+    result += '<span class="term" onclick="toggleTip(this)">' + h.match + '<span class="term-tip">' + h.tip + '</span></span>';
+    pos = h.end;
+  }
+  result += text.slice(pos);
+  return result;
+}
+
+function toggleTip(el) {
+  const wasActive = el.classList.contains('active');
+  document.querySelectorAll('.term.active').forEach(t => t.classList.remove('active', 'tip-below'));
+  if (wasActive) return;
+  el.classList.add('active');
+  const tip = el.querySelector('.term-tip');
+  if (tip) {
+    const rect = tip.getBoundingClientRect();
+    if (rect.top < 60) {
+      el.classList.add('tip-below');
+    }
+  }
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.term')) {
+    document.querySelectorAll('.term.active').forEach(t => t.classList.remove('active', 'tip-below'));
+  }
+});
+
 const scenarios = [
   {
     id: 1,
@@ -1031,18 +1173,18 @@ function showScenario() {
 
   document.getElementById('scenarioBadge').textContent = sc.topic;
   document.getElementById('scenarioTitle').textContent = sc.title;
-  document.getElementById('doctorText').textContent = sc.doctor;
+  document.getElementById('doctorText').innerHTML = glossarize(sc.doctor);
 
   const factsEl = document.getElementById('contextFacts');
   factsEl.innerHTML = sc.facts.map(f =>
-    '<div class="fact"><span class="fact-icon">' + f.icon + '</span><span>' + f.text + '</span></div>'
+    '<div class="fact"><span class="fact-icon">' + f.icon + '</span><span>' + glossarize(f.text) + '</span></div>'
   ).join('');
 
   const choicesEl = document.getElementById('choicesContainer');
   choicesEl.innerHTML = sc.choices.map(c =>
     '<button class="choice-btn ' + c.type + '" data-id="' + c.id + '" onclick="selectChoice(\'' + c.id + '\')">' +
       '<div class="choice-icon">' + c.icon + '</div>' +
-      '<div class="choice-text"><strong>' + c.title + '</strong><span>' + c.desc + '</span></div>' +
+      '<div class="choice-text"><strong>' + c.title + '</strong><span>' + glossarize(c.desc) + '</span></div>' +
     '</button>'
   ).join('');
 
@@ -1084,21 +1226,21 @@ function selectChoice(choiceId) {
 
   const fbBox = document.getElementById('feedbackBox');
   fbBox.className = 'feedback-box visible ' + (isCorrect ? 'correct' : 'wrong');
-  document.getElementById('fbTitle').textContent = fb.title;
-  document.getElementById('fbText').textContent = fb.text;
+  document.getElementById('fbTitle').innerHTML = fb.title;
+  document.getElementById('fbText').innerHTML = glossarize(fb.text);
 
   if (sc.pran && sc.pran.length) {
     const pranEl = document.getElementById('pranHint');
     pranEl.className = 'pran-hint visible';
     document.getElementById('pranQuestions').innerHTML = sc.pran.map(q =>
-      '<div class="ph-item">' + q + '</div>'
+      '<div class="ph-item">' + glossarize(q) + '</div>'
     ).join('');
   }
 
   if (sc.myth) {
     const mythEl = document.getElementById('mythBox');
     mythEl.className = 'myth-box visible';
-    mythEl.innerHTML = sc.myth;
+    mythEl.innerHTML = glossarize(sc.myth);
   }
 
   document.getElementById('nextBtn').className = 'next-btn visible';
